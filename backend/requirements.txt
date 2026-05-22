@@ -3,3 +3,13 @@ uvicorn
 python-dotenv
 pydantic
 pydantic-settings
+
+# Database
+psycopg2-binary
+sqlalchemy
+
+# Cache
+redis
+
+# Object Storage
+minio

@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    """Basic application settings"""
+    """Application settings with database, cache, and storage configuration"""
     
     # Application
     APP_NAME: str = "Data Observability Platform"
@@ -11,6 +11,29 @@ class Settings(BaseSettings):
     
     # API
     API_V1_PREFIX: str = "/api/v1"
+    
+    # PostgreSQL Database
+    POSTGRES_HOST: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_USER: str = "dop_user"
+    POSTGRES_PASSWORD: str = "dop_password"
+    POSTGRES_DB: str = "data_observability"
+    DATABASE_URL: str = "postgresql://dop_user:dop_password@localhost:5432/data_observability"
+    
+    # Redis Cache
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
+    REDIS_URL: str = "redis://localhost:6379/0"
+    
+    # MinIO Object Storage
+    MINIO_ENDPOINT: str = "localhost:9000"
+    MINIO_ACCESS_KEY: str = "minioadmin"
+    MINIO_SECRET_KEY: str = "minioadmin123"
+    MINIO_SECURE: bool = False
+    MINIO_BUCKET_RAW: str = "raw-data"
+    MINIO_BUCKET_PROCESSED: str = "processed-data"
+    MINIO_BUCKET_AUDIT: str = "audit-data"
     
     class Config:
         env_file = ".env"

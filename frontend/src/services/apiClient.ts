@@ -1,8 +1,17 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
+import type { ApiResponse, ApiError } from './types';
 
 // API base URL from environment variables
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || '/api/v1';
+
+// Log configuration in development
+if (process.env.NODE_ENV === 'development') {
+  console.log('API Configuration:', {
+    baseURL: `${API_BASE_URL}${API_VERSION}`,
+    environment: process.env.NODE_ENV,
+  });
+}
 
 /**
  * Axios client instance with default configuration
@@ -97,5 +106,26 @@ export const apiRequest = {
   delete: <T = any>(url: string, config?: AxiosRequestConfig) =>
     apiClient.delete<T>(url, config),
 };
+
+/**
+ * Helper function to handle API errors
+ */
+export function handleApiError(error: unknown): ApiError {
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError;
+    return {
+      message: axiosError.response?.data?.message || axiosError.message || 'An error occurred',
+      status: axiosError.response?.status || 500,
+      errors: axiosError.response?.data?.errors,
+    };
+  }
+  
+  return {
+    message: error instanceof Error ? error.message : 'An unexpected error occurred',
+    status: 500,
+  };
+}
+
+export default apiClient;
 
 export default apiClient;

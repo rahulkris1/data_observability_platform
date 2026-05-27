@@ -14,3 +14,8 @@ redis
 
 # Object Storage
 minio
+
+# Local PySpark for data validation
+pyspark==3.5.0
+pyarrow
+pandas

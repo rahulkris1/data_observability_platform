@@ -35,6 +35,13 @@ class Settings(BaseSettings):
     MINIO_BUCKET_PROCESSED: str = "processed-data"
     MINIO_BUCKET_AUDIT: str = "audit-data"
     
+    # Local PySpark Configuration
+    SPARK_APP_NAME: str = "DataObservabilityPlatform"
+    SPARK_MASTER: str = "local[*]"  # Use all available cores locally
+    SPARK_DRIVER_MEMORY: str = "2g"
+    SPARK_EXECUTOR_MEMORY: str = "2g"
+    SPARK_LOG_LEVEL: str = "WARN"  # Reduce verbosity for local development
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

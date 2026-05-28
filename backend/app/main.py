@@ -1,10 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, HTTPException, UploadFile
+
+from app.services.ingestion_service import IngestionService
 
 app = FastAPI(
     title="Data Observability Platform",
     description="Basic API for data observability",
     version="0.1.0"
 )
+
+ingestion_service = IngestionService()
 
 
 @app.get("/")
@@ -17,3 +21,18 @@ async def root():
 async def health():
     """Health check endpoint"""
     return {"status": "healthy"}
+
+
+@app.post("/api/v1/ingest")
+async def ingest_file(file: UploadFile = File(...)):
+    """Upload a local dataset file and ingest it into MinIO."""
+    try:
+        file_bytes = await file.read()
+        summary = ingestion_service.ingest_dataset(file.filename, file_bytes, file.content_type)
+        return {"success": True, "result": summary}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail="Unexpected ingestion error")

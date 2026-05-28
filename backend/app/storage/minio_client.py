@@ -63,6 +63,23 @@ class MinIOClient:
                     'error': str(e)
                 }
         return bucket_status
+
+    def create_bucket_if_not_exists(self, bucket_name: str) -> bool:
+        """Create a MinIO bucket if it does not already exist."""
+        try:
+            if not self.client.bucket_exists(bucket_name):
+                self.client.make_bucket(bucket_name)
+            return True
+        except Exception as e:
+            print(f"Failed to create or verify bucket '{bucket_name}': {str(e)}")
+            return False
+
+    def ensure_buckets(self) -> bool:
+        """Ensure all configured buckets exist in MinIO."""
+        for bucket_name in self.buckets.values():
+            if not self.create_bucket_if_not_exists(bucket_name):
+                return False
+        return True
     
     def upload_object(
         self, 
@@ -87,6 +104,9 @@ class MinIOClient:
             bucket_name = self.buckets.get(bucket_type)
             if not bucket_name:
                 raise ValueError(f"Invalid bucket type: {bucket_type}")
+
+            if not self.create_bucket_if_not_exists(bucket_name):
+                raise RuntimeError(f"Bucket '{bucket_name}' is not available")
             
             data_stream = io.BytesIO(data)
             self.client.put_object(

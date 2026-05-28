@@ -19,3 +19,6 @@ minio
 pyspark==3.5.0
 pyarrow
 pandas
+
+# FastAPI file upload support
+python-multipart

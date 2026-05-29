@@ -1,0 +1,101 @@
+{
+  "name": "orders_schema",
+  "description": "Schema contract for order data",
+  "dataset_name": "orders",
+  "version": "1.0.0",
+  "is_active": true,
+  "schema_definition": {
+    "columns": [
+      {
+        "name": "order_id",
+        "data_type": "integer",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "customer_id",
+        "data_type": "integer",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "order_date",
+        "data_type": "timestamp",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "total_amount",
+        "data_type": "float",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "currency",
+        "data_type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "status",
+        "data_type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "shipping_address",
+        "data_type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "billing_address",
+        "data_type": "string",
+        "required": false,
+        "nullable": true
+      },
+      {
+        "name": "discount_applied",
+        "data_type": "float",
+        "required": false,
+        "nullable": true
+      },
+      {
+        "name": "tax_amount",
+        "data_type": "float",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "shipping_cost",
+        "data_type": "float",
+        "required": false,
+        "nullable": true
+      },
+      {
+        "name": "payment_method",
+        "data_type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "is_gift",
+        "data_type": "boolean",
+        "required": false,
+        "nullable": true
+      },
+      {
+        "name": "gift_message",
+        "data_type": "string",
+        "required": false,
+        "nullable": true
+      },
+      {
+        "name": "delivered_date",
+        "data_type": "timestamp",
+        "required": false,
+        "nullable": true
+      }
+    ]
+  }
+}

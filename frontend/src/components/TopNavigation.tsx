@@ -8,6 +8,9 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Upload', href: '/upload' },
+  { label: 'Validation', href: '/validation' },
+  { label: 'Schema Validation', href: '/schema-validation' },
   { label: 'Data Sources', href: '/data-sources' },
   { label: 'Metrics', href: '/metrics' },
   { label: 'Alerts', href: '/alerts' },

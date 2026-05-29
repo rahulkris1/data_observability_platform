@@ -1,0 +1,71 @@
+{
+  "name": "customer_schema",
+  "description": "Schema contract for customer data",
+  "dataset_name": "customers",
+  "version": "1.0.0",
+  "is_active": true,
+  "schema_definition": {
+    "columns": [
+      {
+        "name": "customer_id",
+        "data_type": "integer",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "first_name",
+        "data_type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "last_name",
+        "data_type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "email",
+        "data_type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "phone",
+        "data_type": "string",
+        "required": false,
+        "nullable": true
+      },
+      {
+        "name": "date_of_birth",
+        "data_type": "date",
+        "required": false,
+        "nullable": true
+      },
+      {
+        "name": "registration_date",
+        "data_type": "timestamp",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "is_active",
+        "data_type": "boolean",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "loyalty_points",
+        "data_type": "integer",
+        "required": false,
+        "nullable": true
+      },
+      {
+        "name": "account_balance",
+        "data_type": "float",
+        "required": false,
+        "nullable": true
+      }
+    ]
+  }
+}

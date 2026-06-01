@@ -14,6 +14,12 @@ from app.schemas.contract_schema import (
     ContractValidationSummary,
     ValidateDatasetRequest,
 )
+from app.schemas.validation_schema import (
+    ValidatorSummary,
+    ValidationSummary,
+    ValidationHistoryItem,
+    ValidationMetrics,
+)
 
 __all__ = [
     "DataType",
@@ -25,4 +31,8 @@ __all__ = [
     "ContractValidationResult",
     "ContractValidationSummary",
     "ValidateDatasetRequest",
+    "ValidatorSummary",
+    "ValidationSummary",
+    "ValidationHistoryItem",
+    "ValidationMetrics",
 ]

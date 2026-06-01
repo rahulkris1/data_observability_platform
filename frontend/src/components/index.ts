@@ -2,5 +2,9 @@ export { default as TopNavigation } from './TopNavigation';
 export { default as Table } from './Table';
 export { default as LoadingSpinner, InlineSpinner } from './LoadingSpinner';
 export { default as MetricCard } from './MetricCard';
+export { default as ValidationMetricsWidget } from './ValidationMetricsWidget';
+export { default as DatasetStatisticsCard } from './DatasetStatisticsCard';
+export { default as ValidationFilters } from './ValidationFilters';
+export { default as ExportCSVButton } from './ExportCSVButton';
 
 export type { Column } from './Table';

@@ -8,7 +8,8 @@ from app.core.database import Base
 from app.core.config import settings
 
 # Import all models here to ensure they're registered with Base.metadata
-# from app.models.your_model import YourModel  # Add imports as you create models
+from app.models.schema_contract import SchemaContract
+from app.models.validation_log import ValidationLog
 
 # Alembic Config object
 config = context.config

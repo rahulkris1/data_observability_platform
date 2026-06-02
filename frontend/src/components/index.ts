@@ -6,5 +6,7 @@ export { default as ValidationMetricsWidget } from './ValidationMetricsWidget';
 export { default as DatasetStatisticsCard } from './DatasetStatisticsCard';
 export { default as ValidationFilters } from './ValidationFilters';
 export { default as ExportCSVButton } from './ExportCSVButton';
+export { default as IntegrityViolationsTable } from './IntegrityViolationsTable';
 
 export type { Column } from './Table';
+export type { IntegrityViolation, FailedRow } from './IntegrityViolationsTable';

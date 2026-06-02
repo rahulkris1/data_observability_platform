@@ -6,6 +6,11 @@ from .null_validator import NullValidator
 from .checksum_validator import ChecksumValidator
 from .datatype_validator import DatatypeValidator
 from .column_existence_validator import ColumnExistenceValidator
+from .referential_integrity_validator import (
+    ReferentialIntegrityValidator,
+    detect_duplicates,
+    extract_failed_rows
+)
 
 __all__ = [
     "BaseValidator",
@@ -16,4 +21,7 @@ __all__ = [
     "ChecksumValidator",
     "DatatypeValidator",
     "ColumnExistenceValidator",
+    "ReferentialIntegrityValidator",
+    "detect_duplicates",
+    "extract_failed_rows",
 ]

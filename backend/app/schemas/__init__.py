@@ -20,6 +20,17 @@ from app.schemas.validation_schema import (
     ValidationHistoryItem,
     ValidationMetrics,
 )
+from app.schemas.integrity_schema import (
+    FailedRowRecord,
+    FailedRowsResponse,
+    DuplicateKeyInfo,
+    OrphanForeignKeyInfo,
+    PrimaryKeyValidationResult,
+    ForeignKeyValidationResult,
+    IntegrityValidationSummary,
+    IntegrityViolation,
+    IntegrityViolationsResponse,
+)
 
 __all__ = [
     "DataType",
@@ -35,4 +46,13 @@ __all__ = [
     "ValidationSummary",
     "ValidationHistoryItem",
     "ValidationMetrics",
+    "FailedRowRecord",
+    "FailedRowsResponse",
+    "DuplicateKeyInfo",
+    "OrphanForeignKeyInfo",
+    "PrimaryKeyValidationResult",
+    "ForeignKeyValidationResult",
+    "IntegrityValidationSummary",
+    "IntegrityViolation",
+    "IntegrityViolationsResponse",
 ]

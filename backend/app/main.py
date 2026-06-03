@@ -1,12 +1,16 @@
 from fastapi import FastAPI, File, HTTPException, UploadFile
 
 from app.services.ingestion_service import IngestionService
+from app.api.audit_logs import router as audit_router
 
 app = FastAPI(
     title="Data Observability Platform",
     description="Basic API for data observability",
     version="0.1.0"
 )
+
+# Include routers
+app.include_router(audit_router)
 
 ingestion_service = IngestionService()
 

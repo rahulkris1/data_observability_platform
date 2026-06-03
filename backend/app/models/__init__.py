@@ -5,7 +5,8 @@ Models define the database schema and relationships.
 """
 from app.core.database import Base
 from app.models.base import BaseModel
+from app.models.audit_log import AuditLog
 from app.models.schema_contract import SchemaContract
 from app.models.validation_log import ValidationLog
 
-__all__ = ["Base", "BaseModel", "SchemaContract", "ValidationLog"]
+__all__ = ["Base", "BaseModel", "AuditLog", "SchemaContract", "ValidationLog"]

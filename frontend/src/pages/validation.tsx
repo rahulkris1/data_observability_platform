@@ -7,80 +7,67 @@ import {
   LoadingSpinner
 } from '@/components';
 import type { ValidationSummary, ValidationResult } from '@/components';
-
-// Mock data for demonstration
-const mockValidationSummaries: ValidationSummary[] = [
-  {
-    validatorName: 'SchemaValidator',
-    status: 'passed',
-    totalRecords: 10000,
-    failedRecords: 0,
-    passRate: 100,
-    executionTimeMs: 245.67,
-    message: 'All required columns present with correct data types'
-  },
-  {
-    validatorName: 'NullValidator',
-    status: 'warning',
-    totalRecords: 10000,
-    failedRecords: 150,
-    passRate: 98.5,
-    executionTimeMs: 189.23,
-    message: 'Some null values detected in optional fields'
-  },
-  {
-    validatorName: 'ChecksumValidator',
-    status: 'passed',
-    totalRecords: 10000,
-    failedRecords: 0,
-    passRate: 100,
-    executionTimeMs: 312.45,
-    message: 'Dataset checksum matches expected value, no duplicates found'
-  }
-];
-
-const mockValidationResults: ValidationResult[] = [
-  {
-    validatorName: 'SchemaValidator',
-    status: 'passed',
-    passed: true,
-    totalRecords: 10000,
-    failedRecords: 0,
-    passRate: 100,
-    message: 'Schema validation passed',
-    timestamp: new Date().toISOString(),
-    executionTimeMs: 245.67,
-    errors: []
-  },
-  {
-    validatorName: 'NullValidator',
-    status: 'warning',
-    passed: true,
-    totalRecords: 10000,
-    failedRecords: 150,
-    passRate: 98.5,
-    message: 'Null validation completed with warnings',
-    timestamp: new Date(Date.now() - 60000).toISOString(),
-    executionTimeMs: 189.23,
-    errors: []
-  },
-  {
-    validatorName: 'ChecksumValidator',
-    status: 'passed',
-    passed: true,
-    totalRecords: 10000,
-    failedRecords: 0,
-    passRate: 100,
-    message: 'Checksum validation passed',
-    timestamp: new Date(Date.now() - 120000).toISOString(),
-    executionTimeMs: 312.45,
-    errors: []
-  }
-];
+import { validationService, ValidationExecutionResponse } from '@/services/validationService';
 
 export default function ValidationPage() {
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
+  const [validationResults, setValidationResults] = useState<ValidationExecutionResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedDataset, setSelectedDataset] = useState<string>('');
+  
+  // Convert API response to component format
+  const summaries: ValidationSummary[] = validationResults
+    ? validationResults.validators.map((v) => ({
+        validatorName: v.validator_name,
+        status: v.status as any,
+        totalRecords: v.total_records,
+        failedRecords: v.failed_records,
+        passRate: v.pass_rate,
+        executionTimeMs: v.execution_time_ms || 0,
+        message: v.message,
+      }))
+    : [];
+  
+  const results: ValidationResult[] = validationResults
+    ? validationResults.validators.map((v) => ({
+        validatorName: v.validator_name,
+        status: v.status as any,
+        passed: v.passed,
+        totalRecords: v.total_records,
+        failedRecords: v.failed_records,
+        passRate: v.pass_rate,
+        message: v.message,
+        timestamp: validationResults.validation_timestamp,
+        executionTimeMs: v.execution_time_ms || 0,
+        errors: v.errors,
+      }))
+    : [];
+  
+  const handleRunValidation = async () => {
+    if (!selectedDataset) {
+      setError('Please select a dataset first');
+      return;
+    }
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await validationService.executeValidation({
+        dataset_name: selectedDataset,
+        null_threshold: 5.0,
+      });
+      
+      setValidationResults(response);
+      setShowAlert(false);
+    } catch (err: any) {
+      console.error('Validation error:', err);
+      setError(err.message || 'Failed to execute validation');
+    } finally {
+      setLoading(false);
+    }
+  };
   
   const handleCardClick = (summary: ValidationSummary) => {
     console.log('Card clicked:', summary);
@@ -104,28 +91,69 @@ export default function ValidationPage() {
             </p>
           </div>
           <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center"
-            onClick={() => {
-              setLoading(true);
-              setTimeout(() => setLoading(false), 1500);
-            }}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center"
+            onClick={handleRunValidation}
+            disabled={loading || !selectedDataset}
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Run Validations
-          </button>
-        </div>
+            {loading ? (
+              <>
+                <svg className="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Running...
+              </>
+            ) : (
+              <>/Error Alert */}
+        {showAlert && !error && (
+          <Alert
+            variant="info"
+            title="Validation System Ready"
+            message="Select a dataset and click 'Run Validations' to execute PySpark-based validators."
+            dismissible
+            onClose={() => setShowAlert(false)}
+          />
+        )}
+        
+        {error && (
+          <Alert
+            variant="error"
+            title="Validation Failed"
+            message={error}
+            dismissible
+            onClose={() => setError(null)}
+          />
+        )}
+        
+        {validationResults && (
+          <Alert
+            variant={validationResults.overall_passed ? 'success' : 'warning'}
+          {results.length > 0 ? (
+            <ValidationSummaryCards
+              summaries={summaries}
+              onCardClick={handleCardClick}
+              loading={loading}
+            />
+          ) : (
+            <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No validation results</h3>
+              <p className="mt-1 text-sm text-gray-500">Select a dataset and run validations to see results</p>
+            </div>
+          )}v>
         
         {/* Info Alert */}
         {showAlert && (
           <Alert
-            variant="info"
-            title="Validation System Ready"
-            message="PySpark-based validators are configured and ready to run. This is a placeholder interface for testing validation components."
-            dismissible
-            onClose={() => setShowAlert(false)}
-          />
+            varivalue={selectedDataset}
+                onChange={(e) => setSelectedDataset(e.target.value)}
+              >
+                <option value="">Select a dataset...</option>
+                <option value="customers.csv">customers.csv</option>
+                <option value="orders.csv">orders.csv</option>
+                <option value="products.json">products
         )}
         
         {/* Validation Summary Cards */}
@@ -183,22 +211,32 @@ export default function ValidationPage() {
               </label>
               <select
                 id="schedule"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                disabled
-              >
-                <option>Manual</option>
+                className="w-full px-3blue-50 rounded-lg border border-blue-200">
+            <p className="text-sm text-gray-700">
+              <span className="font-medium">Ready:</span> Select a dataset from MinIO and click "Run Validations" to execute PySpark validators.
+              Results will be stored in PostgreSQL and displayed here
                 <option>Hourly</option>
                 <option>Daily</option>
                 <option>Weekly</option>
               </select>
             </div>
           </div>
-          
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <p className="text-sm text-gray-600">
-              <span className="font-medium">Note:</span> Dataset selection and scheduling features are placeholders. 
-              Validators are ready to use with PySpark DataFrames via the backend API.
-            </p>
+          Validation Results</h2>
+          {results.length > 0 ? (
+            <ValidationResultsTable
+              results={results}
+              onRowClick={handleRowClick}
+              loading={loading}
+            />
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No results yet</h3>
+              <p className="mt-1 text-sm text-gray-500">Run validations to see detailed results</p>
+            </div>
+          )}</p>
           </div>
         </section>
         

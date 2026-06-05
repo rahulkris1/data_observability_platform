@@ -1,0 +1,16 @@
+# Airflow additional requirements
+apache-airflow-providers-postgres==5.10.0
+apache-airflow-providers-redis==3.6.0
+
+# Database
+psycopg2-binary==2.9.9
+
+# Object Storage
+minio==7.2.0
+
+# Cache
+redis==5.0.1
+
+# Data processing
+pandas==2.1.4
+pyarrow==14.0.2

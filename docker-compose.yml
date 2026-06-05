@@ -14,6 +14,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-airflow-db.sql:/docker-entrypoint-initdb.d/init-airflow-db.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dop_user -d data_observability"]
       interval: 10s
@@ -83,12 +84,85 @@ services:
     networks:
       - dop-network
 
+  # Airflow Webserver
+  airflow-webserver:
+    image: apache/airflow:2.8.0-python3.11
+    container_name: dop-airflow-webserver
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://dop_user:dop_password@postgres/airflow_db
+      AIRFLOW__CORE__FERNET_KEY: 'ZmDfcTF7_60GrrY167zsiPd67pEvs0aGOv2oasOM1Pg='
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'true'
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'a25c8_9d7f2b4e1a3c5e9f8b6d4a2c0e8f7b5d3a1c9e7f5b3d1a0c8e6f4b2d0a8'
+      _AIRFLOW_DB_UPGRADE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin123
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/airflow.cfg:/opt/airflow/airflow.cfg
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      bash -c "
+      airflow db init &&
+      airflow users create -r Admin -u admin -e admin@example.com -f Admin -l User -p admin123 || true &&
+      airflow webserver
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - dop-network
+
+  # Airflow Scheduler
+  airflow-scheduler:
+    image: apache/airflow:2.8.0-python3.11
+    container_name: dop-airflow-scheduler
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://dop_user:dop_password@postgres/airflow_db
+      AIRFLOW__CORE__FERNET_KEY: 'ZmDfcTF7_60GrrY167zsiPd67pEvs0aGOv2oasOM1Pg='
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/airflow.cfg:/opt/airflow/airflow.cfg
+    depends_on:
+      airflow-webserver:
+        condition: service_healthy
+    command: airflow scheduler
+    healthcheck:
+      test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob --hostname $(hostname)"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - dop-network
+
 volumes:
   postgres_data:
     driver: local
   redis_data:
     driver: local
   minio_data:
+    driver: local
+  airflow_logs:
+    driver: local
+  airflow_plugins:
     driver: local
 
 networks:

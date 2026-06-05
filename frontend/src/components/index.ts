@@ -7,6 +7,9 @@ export { default as DatasetStatisticsCard } from './DatasetStatisticsCard';
 export { default as ValidationFilters } from './ValidationFilters';
 export { default as ExportCSVButton } from './ExportCSVButton';
 export { default as IntegrityViolationsTable } from './IntegrityViolationsTable';
+export { default as AirflowHealthWidget } from './AirflowHealthWidget';
+export { default as SchedulerStatusIndicator } from './SchedulerStatusIndicator';
+export { default as PipelineSummaryCards } from './PipelineSummaryCards';
 
 export type { Column } from './Table';
 export type { IntegrityViolation, FailedRow } from './IntegrityViolationsTable';

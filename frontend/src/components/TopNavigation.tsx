@@ -11,6 +11,7 @@ const navItems: NavItem[] = [
   { label: 'Upload', href: '/upload' },
   { label: 'Validation', href: '/validation' },
   { label: 'Schema Validation', href: '/schema-validation' },
+  { label: 'Pipelines', href: '/pipelines' },
   { label: 'Data Sources', href: '/data-sources' },
   { label: 'Metrics', href: '/metrics' },
   { label: 'Alerts', href: '/alerts' },

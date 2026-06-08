@@ -10,6 +10,7 @@ from app.services.schema_contract_service import (
 )
 from app.services.validation_log_service import ValidationLogService
 from app.services.validation_aggregator import ValidationAggregator
+from app.services.dag_execution_service import DAGExecutionService
 
 __all__ = [
     "AuditService",
@@ -17,4 +18,5 @@ __all__ = [
     "get_schema_contract_service",
     "ValidationLogService",
     "ValidationAggregator",
+    "DAGExecutionService",
 ]

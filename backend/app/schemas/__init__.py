@@ -31,6 +31,11 @@ from app.schemas.integrity_schema import (
     IntegrityViolation,
     IntegrityViolationsResponse,
 )
+from app.schemas.dag_execution_schema import (
+    DAGExecutionResponse,
+    DAGExecutionListResponse,
+    DAGExecutionSummary,
+)
 
 __all__ = [
     "DataType",
@@ -55,4 +60,7 @@ __all__ = [
     "IntegrityValidationSummary",
     "IntegrityViolation",
     "IntegrityViolationsResponse",
+    "DAGExecutionResponse",
+    "DAGExecutionListResponse",
+    "DAGExecutionSummary",
 ]

@@ -10,6 +10,8 @@ export { default as IntegrityViolationsTable } from './IntegrityViolationsTable'
 export { default as AirflowHealthWidget } from './AirflowHealthWidget';
 export { default as SchedulerStatusIndicator } from './SchedulerStatusIndicator';
 export { default as PipelineSummaryCards } from './PipelineSummaryCards';
+export { default as LogsTable } from './LogsTable';
 
 export type { Column } from './Table';
 export type { IntegrityViolation, FailedRow } from './IntegrityViolationsTable';
+export type { LogFilters } from './LogsTable';

@@ -2,6 +2,16 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 
 from app.services.ingestion_service import IngestionService
 from app.api.audit_logs import router as audit_router
+from app.api.observability_routes import router as observability_router
+from app.observability import configure_logging, get_metrics_service
+from app.observability.middleware import RequestLoggingMiddleware
+
+# Configure logging on startup
+configure_logging(
+    log_level="INFO",
+    enable_console=True,
+    enable_json=True,
+)
 
 app = FastAPI(
     title="Data Observability Platform",
@@ -9,8 +19,13 @@ app = FastAPI(
     version="0.1.0"
 )
 
+# Add middleware
+metrics_service = get_metrics_service()
+app.add_middleware(RequestLoggingMiddleware, metrics_service=metrics_service)
+
 # Include routers
 app.include_router(audit_router)
+app.include_router(observability_router)
 
 ingestion_service = IngestionService()
 

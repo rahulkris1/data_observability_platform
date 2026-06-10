@@ -36,6 +36,20 @@ from app.schemas.dag_execution_schema import (
     DAGExecutionListResponse,
     DAGExecutionSummary,
 )
+from app.schemas.metrics_schema import (
+    MetricRecord,
+    DailyAggregation,
+    ValidationTypeAggregation,
+    DatasetAggregation,
+    TimeSeriesPoint,
+    MetricsSummary,
+    DailyAggregationResponse,
+    ValidationTypeAggregationResponse,
+    DatasetAggregationResponse,
+    TimeSeriesResponse,
+    MetricRecordResponse,
+    MetricsListResponse,
+)
 
 __all__ = [
     "DataType",
@@ -63,4 +77,16 @@ __all__ = [
     "DAGExecutionResponse",
     "DAGExecutionListResponse",
     "DAGExecutionSummary",
+    "MetricRecord",
+    "DailyAggregation",
+    "ValidationTypeAggregation",
+    "DatasetAggregation",
+    "TimeSeriesPoint",
+    "MetricsSummary",
+    "DailyAggregationResponse",
+    "ValidationTypeAggregationResponse",
+    "DatasetAggregationResponse",
+    "TimeSeriesResponse",
+    "MetricRecordResponse",
+    "MetricsListResponse",
 ]

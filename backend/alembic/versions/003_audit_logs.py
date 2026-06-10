@@ -33,7 +33,7 @@ def upgrade() -> None:
         sa.Column('validator_name', sa.String(length=255), nullable=False),
         sa.Column('triggered_by', sa.String(length=100), nullable=True),
         sa.Column('environment', sa.String(length=50), nullable=True),
-        sa.Column('metadata', postgresql.JSON(astext_type=sa.Text()), nullable=True),
+        sa.Column('extra_metadata', postgresql.JSON(astext_type=sa.Text()), nullable=True),
         sa.Column('error_summary', sa.Text(), nullable=True),
         sa.Column('details', postgresql.JSON(astext_type=sa.Text()), nullable=True),
         sa.PrimaryKeyConstraint('id')

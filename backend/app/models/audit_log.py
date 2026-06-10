@@ -20,7 +20,7 @@ class AuditLog(BaseModel):
         validator_name: Name of the validator that executed
         triggered_by: User or system that triggered the validation (e.g., 'system', 'scheduler', 'manual')
         environment: Environment where validation executed (e.g., 'dev', 'staging', 'production')
-        metadata: JSON structure with additional audit metadata (tags, context, configuration)
+        extra_metadata: JSON structure with additional audit metadata (tags, context, configuration)
         error_summary: Summary of errors encountered
         details: JSON structure with detailed execution results
     """
@@ -43,7 +43,7 @@ class AuditLog(BaseModel):
     environment = Column(String(50), nullable=True, default='dev')
     
     # Extended audit metadata
-    metadata = Column(JSON, nullable=True)
+    extra_metadata = Column(JSON, nullable=True)
     error_summary = Column(Text, nullable=True)
     details = Column(JSON, nullable=True)
     

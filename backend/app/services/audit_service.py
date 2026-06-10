@@ -34,7 +34,7 @@ class AuditService:
         validator_name: str = "",
         triggered_by: str = "system",
         environment: str = "dev",
-        metadata: Optional[Dict[str, Any]] = None,
+        extra_metadata: Optional[Dict[str, Any]] = None,
         error_summary: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None
     ) -> AuditLog:
@@ -52,7 +52,7 @@ class AuditService:
             validator_name: Name of the validator that executed
             triggered_by: User or system that triggered the validation
             environment: Environment where validation executed
-            metadata: Additional audit metadata (tags, context, configuration)
+            extra_metadata: Additional audit metadata (tags, context, configuration)
             error_summary: Summary of errors encountered
             details: Detailed execution results
             
@@ -70,7 +70,7 @@ class AuditService:
             validator_name=validator_name,
             triggered_by=triggered_by,
             environment=environment,
-            metadata=metadata,
+            extra_metadata=extra_metadata,
             error_summary=error_summary,
             details=details
         )

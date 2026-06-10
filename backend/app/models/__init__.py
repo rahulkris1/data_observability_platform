@@ -9,5 +9,6 @@ from app.models.audit_log import AuditLog
 from app.models.schema_contract import SchemaContract
 from app.models.validation_log import ValidationLog
 from app.models.dag_execution import DAGExecution
+from app.models.metrics import Metric
 
-__all__ = ["Base", "BaseModel", "AuditLog", "SchemaContract", "ValidationLog", "DAGExecution"]
+__all__ = ["Base", "BaseModel", "AuditLog", "SchemaContract", "ValidationLog", "DAGExecution", "Metric"]

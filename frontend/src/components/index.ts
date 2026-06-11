@@ -11,6 +11,10 @@ export { default as AirflowHealthWidget } from './AirflowHealthWidget';
 export { default as SchedulerStatusIndicator } from './SchedulerStatusIndicator';
 export { default as PipelineSummaryCards } from './PipelineSummaryCards';
 export { default as LogsTable } from './LogsTable';
+export { default as FreshnessMetricsChart } from './FreshnessMetricsChart';
+export { default as LatencyChart } from './LatencyChart';
+export { default as SLAIndicatorCard } from './SLAIndicatorCard';
+export { default as ThresholdStatusBadge } from './ThresholdStatusBadge';
 
 export type { Column } from './Table';
 export type { IntegrityViolation, FailedRow } from './IntegrityViolationsTable';

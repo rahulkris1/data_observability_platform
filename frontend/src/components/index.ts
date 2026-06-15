@@ -15,7 +15,13 @@ export { default as FreshnessMetricsChart } from './FreshnessMetricsChart';
 export { default as LatencyChart } from './LatencyChart';
 export { default as SLAIndicatorCard } from './SLAIndicatorCard';
 export { default as ThresholdStatusBadge } from './ThresholdStatusBadge';
+export { default as LoadStatusIndicator } from './LoadStatusIndicator';
+export { default as LoadHistoryTable } from './LoadHistoryTable';
+export { default as FailedLoadSection } from './FailedLoadSection';
 
 export type { Column } from './Table';
 export type { IntegrityViolation, FailedRow } from './IntegrityViolationsTable';
 export type { LogFilters } from './LogsTable';
+export type { LoadStatus } from './LoadStatusIndicator';
+export type { LoadHistoryRecord } from './LoadHistoryTable';
+export type { FailedLoad, FailedLoadWithDetails } from './FailedLoadSection';

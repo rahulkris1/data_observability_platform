@@ -1,6 +1,9 @@
 import React from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import MetricCard from '../components/MetricCard';
+import CacheStatusIndicator from '../components/CacheStatusIndicator';
+import PipelinePerformanceSection from '../components/PipelinePerformanceSection';
+import CacheMetricsCard from '../components/CacheMetricsCard';
 
 export default function Dashboard() {
   // Placeholder metrics data
@@ -70,6 +73,21 @@ export default function Dashboard() {
             icon={metric.icon}
           />
         ))}
+      </div>
+
+      {/* Cache Status Indicator */}
+      <div className="mb-6">
+        <CacheStatusIndicator />
+      </div>
+
+      {/* Cache Monitoring Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2">
+          <PipelinePerformanceSection />
+        </div>
+        <div>
+          <CacheMetricsCard />
+        </div>
       </div>
 
       {/* Additional Dashboard Sections */}

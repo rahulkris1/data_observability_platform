@@ -22,6 +22,7 @@ from app.services.validation_log_service import ValidationLogService
 from app.services.audit_service import AuditService
 from app.services.ingestion_service import IngestionService
 from app.services.schema_contract_service import SchemaContractService
+from app.services.cache_service import get_cache_service
 from app.storage.minio_client import minio_client
 from app.utils.spark_utils import get_spark
 from app.validators.base_validator import ValidationStatus

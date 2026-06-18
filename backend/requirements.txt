@@ -23,6 +23,11 @@ pandas
 # FastAPI file upload support
 python-multipart
 
+# Authentication
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
 # Airflow integration
 apache-airflow-client==2.8.0
 requests

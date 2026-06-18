@@ -1,5 +1,6 @@
 import React from 'react';
 import TopNavigation from '@/components/TopNavigation';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -13,9 +14,10 @@ export default function DashboardLayout({
   subtitle 
 }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top Navigation */}
-      <TopNavigation />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        {/* Top Navigation */}
+        <TopNavigation />
 
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
@@ -47,5 +49,6 @@ export default function DashboardLayout({
         </div>
       </footer>
     </div>
+    </ProtectedRoute>
   );
 }

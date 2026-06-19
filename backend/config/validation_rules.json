@@ -1,0 +1,130 @@
+{
+  "version": "1.0",
+  "rules": [
+    {
+      "rule_id": "null_check_customers",
+      "name": "Customer Null Check",
+      "description": "Ensure critical customer fields are not null",
+      "rule_type": "null_check",
+      "enabled": true,
+      "target_columns": ["customer_id", "email", "created_at"],
+      "parameters": {},
+      "thresholds": [
+        {
+          "metric": "pass_rate",
+          "operator": ">=",
+          "value": 99.5
+        },
+        {
+          "metric": "failed_records",
+          "operator": "<=",
+          "value": 10
+        }
+      ],
+      "severity": "error",
+      "tags": ["customers", "data_quality", "critical"]
+    },
+    {
+      "rule_id": "datatype_customers",
+      "name": "Customer Datatype Validation",
+      "description": "Validate customer field datatypes",
+      "rule_type": "datatype",
+      "enabled": true,
+      "target_columns": [],
+      "parameters": {
+        "expected_types": {
+          "customer_id": "integer",
+          "email": "string",
+          "age": "integer",
+          "created_at": "timestamp"
+        }
+      },
+      "thresholds": [
+        {
+          "metric": "pass_rate",
+          "operator": "==",
+          "value": 100.0
+        }
+      ],
+      "severity": "error",
+      "tags": ["customers", "schema", "critical"]
+    },
+    {
+      "rule_id": "null_check_orders",
+      "name": "Orders Null Check",
+      "description": "Ensure order fields are populated",
+      "rule_type": "null_check",
+      "enabled": true,
+      "target_columns": ["order_id", "customer_id", "total_amount"],
+      "parameters": {},
+      "thresholds": [
+        {
+          "metric": "pass_rate",
+          "operator": ">=",
+          "value": 95.0
+        }
+      ],
+      "severity": "warning",
+      "tags": ["orders", "data_quality"]
+    },
+    {
+      "rule_id": "range_check_age",
+      "name": "Age Range Validation",
+      "description": "Validate customer age is within reasonable range",
+      "rule_type": "range",
+      "enabled": false,
+      "target_columns": ["age"],
+      "parameters": {
+        "min_value": 0,
+        "max_value": 120
+      },
+      "thresholds": [
+        {
+          "metric": "pass_rate",
+          "operator": ">=",
+          "value": 98.0
+        }
+      ],
+      "severity": "warning",
+      "tags": ["customers", "business_logic"]
+    },
+    {
+      "rule_id": "pattern_check_email",
+      "name": "Email Format Validation",
+      "description": "Validate email format using regex pattern",
+      "rule_type": "pattern",
+      "enabled": false,
+      "target_columns": ["email"],
+      "parameters": {
+        "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+      },
+      "thresholds": [
+        {
+          "metric": "pass_rate",
+          "operator": ">=",
+          "value": 99.0
+        }
+      ],
+      "severity": "warning",
+      "tags": ["customers", "format_validation"]
+    },
+    {
+      "rule_id": "uniqueness_customer_id",
+      "name": "Customer ID Uniqueness",
+      "description": "Ensure customer_id is unique",
+      "rule_type": "uniqueness",
+      "enabled": true,
+      "target_columns": ["customer_id"],
+      "parameters": {},
+      "thresholds": [
+        {
+          "metric": "pass_rate",
+          "operator": "==",
+          "value": 100.0
+        }
+      ],
+      "severity": "error",
+      "tags": ["customers", "integrity", "critical"]
+    }
+  ]
+}

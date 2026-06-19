@@ -18,6 +18,10 @@ export { default as ThresholdStatusBadge } from './ThresholdStatusBadge';
 export { default as LoadStatusIndicator } from './LoadStatusIndicator';
 export { default as LoadHistoryTable } from './LoadHistoryTable';
 export { default as FailedLoadSection } from './FailedLoadSection';
+export { default as Alert } from './Alert';
+export { default as RulesEditor } from './RulesEditor';
+export { default as RuleActivationToggle } from './RuleActivationToggle';
+export { default as RulePreview } from './RulePreview';
 
 export type { Column } from './Table';
 export type { IntegrityViolation, FailedRow } from './IntegrityViolationsTable';

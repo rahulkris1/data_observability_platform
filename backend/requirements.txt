@@ -12,6 +12,9 @@ alembic
 # Cache
 redis
 
+# Task Queue
+celery[redis]
+
 # Object Storage
 minio
 

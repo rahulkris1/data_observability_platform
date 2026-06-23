@@ -11,22 +11,28 @@ from app.celery_app import celery_app
 @celery_app.task(bind=True, name="profile_dataset_async")
 def profile_dataset_async(
     self,
-    dataset_path: str,
     dataset_name: str,
-    columns: Optional[List[str]] = None,
+    bucket_name: str,
+    object_name: str,
+    profiled_by: str = 'system'
 ) -> Dict[str, Any]:
     """
-    Asynchronously profile a dataset and generate quality metrics.
+    Asynchronously profile a dataset from MinIO storage and store results in PostgreSQL.
     
     Args:
         self: Task instance (injected by Celery)
-        dataset_path: Path to the dataset file
-        dataset_name: Name of the dataset
-        columns: Optional list of specific columns to profile
+        dataset_name: Name of the dataset to profile
+        bucket_name: MinIO bucket name
+        object_name: Object name in MinIO
+        profiled_by: User or system initiating profiling
         
     Returns:
         Dictionary containing profiling results
     """
+    import pandas as pd
+    from app.services.dataset_profiling_service import get_profiling_service
+    from app.storage.minio_client import minio_client
+    
     start_time = time.time()
     
     # Update task state to running
@@ -40,86 +46,79 @@ def profile_dataset_async(
     )
     
     try:
-        from pyspark.sql import SparkSession
-        from pyspark.sql.functions import col, count, countDistinct, mean, stddev, min as spark_min, max as spark_max
-        
-        # Initialize Spark session
-        spark = SparkSession.builder.appName("DataProfiling").getOrCreate()
-        
-        # Load dataset
-        df = spark.read.csv(dataset_path, header=True, inferSchema=True)
-        
-        total_rows = df.count()
-        
-        # Profile each column
-        column_profiles = []
-        columns_to_profile = columns if columns else df.columns
-        
-        for col_name in columns_to_profile:
-            # Update progress
-            self.update_state(
-                state="RUNNING",
-                meta={
-                    "status": "running",
-                    "current_column": col_name,
-                    "progress": f"{len(column_profiles)}/{len(columns_to_profile)}",
-                }
-            )
-            
-            # Calculate statistics
-            stats = df.select(
-                count(col(col_name)).alias("non_null_count"),
-                countDistinct(col(col_name)).alias("distinct_count"),
-            ).collect()[0]
-            
-            non_null_count = stats["non_null_count"]
-            distinct_count = stats["distinct_count"]
-            null_count = total_rows - non_null_count
-            null_percentage = (null_count / total_rows * 100) if total_rows > 0 else 0
-            
-            profile = {
-                "column_name": col_name,
-                "data_type": str(df.schema[col_name].dataType),
-                "total_rows": total_rows,
-                "non_null_count": non_null_count,
-                "null_count": null_count,
-                "null_percentage": round(null_percentage, 2),
-                "distinct_count": distinct_count,
-                "distinct_percentage": round((distinct_count / total_rows * 100) if total_rows > 0 else 0, 2),
+        # Download dataset from MinIO
+        self.update_state(
+            state="RUNNING",
+            meta={
+                "status": "downloading",
+                "dataset": dataset_name,
+                "message": "Downloading dataset from storage",
             }
-            
-            # Add numeric statistics if applicable
-            if df.schema[col_name].dataType.typeName() in ["integer", "long", "float", "double"]:
-                numeric_stats = df.select(
-                    mean(col(col_name)).alias("mean"),
-                    stddev(col(col_name)).alias("stddev"),
-                    spark_min(col(col_name)).alias("min"),
-                    spark_max(col(col_name)).alias("max"),
-                ).collect()[0]
-                
-                profile.update({
-                    "mean": round(numeric_stats["mean"], 2) if numeric_stats["mean"] else None,
-                    "stddev": round(numeric_stats["stddev"], 2) if numeric_stats["stddev"] else None,
-                    "min": numeric_stats["min"],
-                    "max": numeric_stats["max"],
-                })
-            
-            column_profiles.append(profile)
+        )
+        
+        file_obj = minio_client.get_object(bucket_name, object_name)
+        
+        # Read into pandas DataFrame based on file type
+        if object_name.endswith('.csv'):
+            df = pd.read_csv(file_obj)
+        elif object_name.endswith('.parquet'):
+            df = pd.read_parquet(file_obj)
+        elif object_name.endswith('.json'):
+            df = pd.read_json(file_obj)
+        else:
+            raise ValueError(f"Unsupported file type: {object_name}")
+        
+        # Profile the dataset
+        self.update_state(
+            state="RUNNING",
+            meta={
+                "status": "profiling",
+                "dataset": dataset_name,
+                "message": "Calculating statistics",
+            }
+        )
+        
+        service = get_profiling_service()
+        result = service.profile_dataset(
+            df=df,
+            dataset_name=dataset_name,
+            profiled_by=profiled_by
+        )
         
         execution_time = time.time() - start_time
         
         return {
             "status": "completed",
-            "dataset": dataset_name,
-            "total_rows": total_rows,
-            "total_columns": len(columns_to_profile),
-            "column_profiles": column_profiles,
-            "execution_time": execution_time,
-            "completed_at": datetime.utcnow().isoformat(),
+            "profiling_id": result.id,
+            "dataset_name": result.dataset_name,
+            "row_count": result.row_count,
+            "column_count": result.column_count,
+            "execution_time_seconds": execution_time,
+            "profiled_at": result.created_at.isoformat() if result.created_at else None,
         }
         
     except Exception as e:
         execution_time = time.time() - start_time
+        
+        # Log the failed profiling
+        try:
+            from app.services.dataset_profiling_service import get_profiling_service
+            from app.models.profiling_result import ProfilingResult
+            from app.core.database import SessionLocal
+            
+            db = SessionLocal()
+            failed_result = ProfilingResult(
+                dataset_name=dataset_name,
+                status='failed',
+                execution_time_ms=execution_time * 1000,
+                error_message=str(e),
+                profiled_by=profiled_by
+            )
+            db.add(failed_result)
+            db.commit()
+            db.close()
+        except Exception as log_error:
+            print(f"Failed to log error: {log_error}")
         
         error_msg = f"Dataset profiling failed: {str(e)}"
         

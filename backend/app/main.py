@@ -3,6 +3,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from app.services.ingestion_service import IngestionService
 from app.api.audit_logs import router as audit_router
 from app.api.observability_routes import router as observability_router
+from app.api.profiling_routes import router as profiling_router
 from app.observability import configure_logging, get_metrics_service
 from app.observability.middleware import RequestLoggingMiddleware
 
@@ -26,6 +27,7 @@ app.add_middleware(RequestLoggingMiddleware, metrics_service=metrics_service)
 # Include routers
 app.include_router(audit_router)
 app.include_router(observability_router)
+app.include_router(profiling_router)
 
 ingestion_service = IngestionService()
 

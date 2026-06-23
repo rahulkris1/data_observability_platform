@@ -3,3 +3,4 @@ export * from './types';
 export * from './auditService';
 export * from './retryService';
 export * from './authService';
+export * from './profilingService';

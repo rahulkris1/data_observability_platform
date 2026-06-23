@@ -22,6 +22,8 @@ export { default as Alert } from './Alert';
 export { default as RulesEditor } from './RulesEditor';
 export { default as RuleActivationToggle } from './RuleActivationToggle';
 export { default as RulePreview } from './RulePreview';
+export { default as ProfilingSummaryCards } from './ProfilingSummaryCards';
+export { default as ColumnDistributionChart } from './ColumnDistributionChart';
 
 export type { Column } from './Table';
 export type { IntegrityViolation, FailedRow } from './IntegrityViolationsTable';

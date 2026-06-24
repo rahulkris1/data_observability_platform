@@ -11,5 +11,18 @@ from app.models.validation_log import ValidationLog
 from app.models.dag_execution import DAGExecution
 from app.models.metrics import Metric
 from app.models.profiling_result import ProfilingResult
+from app.models.schema_version import SchemaVersion
+from app.models.schema_drift_history import SchemaDriftHistory
 
-__all__ = ["Base", "BaseModel", "AuditLog", "SchemaContract", "ValidationLog", "DAGExecution", "Metric", "ProfilingResult"]
+__all__ = [
+    "Base", 
+    "BaseModel", 
+    "AuditLog", 
+    "SchemaContract", 
+    "ValidationLog", 
+    "DAGExecution", 
+    "Metric", 
+    "ProfilingResult",
+    "SchemaVersion",
+    "SchemaDriftHistory"
+]

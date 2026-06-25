@@ -25,7 +25,7 @@ class FailedLoad(BaseModel):
         can_retry: Flag indicating if load can be retried
         retry_validated_at: When retry validation was last performed
         retry_validated_by: User who validated the retry
-        metadata: Additional context and diagnostic information
+        failure_metadata: Additional context and diagnostic information
     """
     __tablename__ = "failed_loads"
     
@@ -48,7 +48,7 @@ class FailedLoad(BaseModel):
     retry_validated_at = Column(DateTime, nullable=True)
     retry_validated_by = Column(String(255), nullable=True)
     
-    metadata = Column(JSON, nullable=True)
+    failure_metadata = Column(JSON, nullable=True)
     
     def __repr__(self) -> str:
         """String representation of the failed load record"""
@@ -76,7 +76,7 @@ class LoadAuditLog(BaseModel):
         execution_time_seconds: Total execution time in seconds
         triggered_by: User or system that triggered the load
         notes: Additional notes or context
-        metadata: Additional diagnostic information
+        load_metadata: Additional diagnostic information
     """
     __tablename__ = "load_audit_logs"
     
@@ -97,7 +97,7 @@ class LoadAuditLog(BaseModel):
     execution_time_seconds = Column(Integer, nullable=True)
     triggered_by = Column(String(255), nullable=True)
     notes = Column(Text, nullable=True)
-    metadata = Column(JSON, nullable=True)
+    load_metadata = Column(JSON, nullable=True)
     
     def __repr__(self) -> str:
         """String representation of the audit log record"""

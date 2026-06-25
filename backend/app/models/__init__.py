@@ -13,6 +13,7 @@ from app.models.metrics import Metric
 from app.models.profiling_result import ProfilingResult
 from app.models.schema_version import SchemaVersion
 from app.models.schema_drift_history import SchemaDriftHistory
+from app.models.health_score import HealthScore
 
 __all__ = [
     "Base", 
@@ -24,5 +25,6 @@ __all__ = [
     "Metric", 
     "ProfilingResult",
     "SchemaVersion",
-    "SchemaDriftHistory"
+    "SchemaDriftHistory",
+    "HealthScore"
 ]

@@ -24,6 +24,9 @@ export { default as RuleActivationToggle } from './RuleActivationToggle';
 export { default as RulePreview } from './RulePreview';
 export { default as ProfilingSummaryCards } from './ProfilingSummaryCards';
 export { default as ColumnDistributionChart } from './ColumnDistributionChart';
+export { default as HealthScoreWidget } from './HealthScoreWidget';
+export { default as PipelineScoreCard } from './PipelineScoreCard';
+export { default as HealthTrendChart } from './HealthTrendChart';
 
 export type { Column } from './Table';
 export type { IntegrityViolation, FailedRow } from './IntegrityViolationsTable';

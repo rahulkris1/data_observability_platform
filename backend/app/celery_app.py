@@ -15,6 +15,7 @@ celery_app = Celery(
     include=[
         "app.tasks.async_validation_task",
         "app.tasks.async_profiling_task",
+        "app.tasks.health_score_tasks",
     ]
 )
 
@@ -38,4 +39,5 @@ celery_app.conf.update(
 celery_app.conf.task_routes = {
     "app.tasks.async_validation_task.*": {"queue": "default"},
     "app.tasks.async_profiling_task.*": {"queue": "default"},
+    "app.tasks.health_score_tasks.*": {"queue": "default"},
 }

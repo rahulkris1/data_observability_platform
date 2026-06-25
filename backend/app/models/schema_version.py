@@ -29,7 +29,7 @@ class SchemaVersion(BaseModel):
             }
         detected_at: Timestamp when this schema was detected
         source: Source of schema detection (e.g., 'ingestion', 'validation', 'manual')
-        metadata: Additional metadata about the schema version
+        version_metadata: Additional metadata about the schema version
     """
     __tablename__ = "schema_versions"
     
@@ -39,7 +39,7 @@ class SchemaVersion(BaseModel):
     schema_definition = Column(JSON, nullable=False)
     detected_at = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
     source = Column(String(100), nullable=True)
-    metadata = Column(JSON, nullable=True)
+    version_metadata = Column(JSON, nullable=True)
     
     # Relationship to drift history
     drift_records_as_current = relationship(

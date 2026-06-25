@@ -5,6 +5,7 @@ from app.api.audit_logs import router as audit_router
 from app.api.observability_routes import router as observability_router
 from app.api.profiling_routes import router as profiling_router
 from app.api.schema_drift_routes import router as schema_drift_router
+from app.api.health_routes import router as health_router
 from app.observability import configure_logging, get_metrics_service
 from app.observability.middleware import RequestLoggingMiddleware
 
@@ -30,6 +31,7 @@ app.include_router(audit_router)
 app.include_router(observability_router)
 app.include_router(profiling_router)
 app.include_router(schema_drift_router)
+app.include_router(health_router)
 
 ingestion_service = IngestionService()
 

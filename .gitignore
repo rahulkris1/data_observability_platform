@@ -63,3 +63,17 @@ dist/
 htmlcov/
 .pytest_cache/
 coverage/
+.tox/
+.cache/
+*.cover
+*.py,cover
+.hypothesis/
+
+# Test artifacts and reports
+test-results/
+junit.xml
+test-output/
+
+# Markdown documentation files
+*.md
+!README.md

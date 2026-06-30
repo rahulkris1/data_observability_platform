@@ -77,3 +77,15 @@ test-output/
 # Markdown documentation files
 *.md
 !README.md
+!DOCKER.md
+!GETTING_STARTED.md
+
+# Docker
+.env.docker
+docker-compose.override.yml
+.docker/
+
+# Logs
+logs/
+*.log
+airflow/logs/

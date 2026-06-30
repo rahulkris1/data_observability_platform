@@ -1,0 +1,45 @@
+# Docker Compose Commands for Data Observability Platform
+
+# Start all services
+docker-compose up -d
+
+# Start all services and rebuild
+docker-compose up -d --build
+
+# Stop all services
+docker-compose down
+
+# Stop all services and remove volumes
+docker-compose down -v
+
+# View logs for all services
+docker-compose logs -f
+
+# View logs for specific service
+docker-compose logs -f backend
+docker-compose logs -f frontend
+docker-compose logs -f postgres
+docker-compose logs -f redis
+docker-compose logs -f minio
+docker-compose logs -f airflow-webserver
+docker-compose logs -f airflow-scheduler
+docker-compose logs -f celery-worker
+
+# Restart specific service
+docker-compose restart backend
+docker-compose restart frontend
+
+# Check status
+docker-compose ps
+
+# Execute command in container
+docker-compose exec backend bash
+docker-compose exec frontend sh
+docker-compose exec postgres psql -U dop_user -d data_observability
+
+# Rebuild specific service
+docker-compose up -d --build backend
+docker-compose up -d --build frontend
+
+# View resource usage
+docker stats

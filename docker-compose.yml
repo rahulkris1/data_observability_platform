@@ -20,8 +20,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
     networks:
       - dop-network
+    restart: unless-stopped
 
   # Redis Cache
   redis:
@@ -37,8 +39,10 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+      start_period: 5s
     networks:
       - dop-network
+    restart: unless-stopped
 
   # MinIO Object Storage
   minio:
@@ -58,8 +62,10 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+      start_period: 10s
     networks:
       - dop-network
+    restart: unless-stopped
 
   # MinIO Client for bucket creation
   minio-setup:
@@ -83,6 +89,128 @@ services:
       "
     networks:
       - dop-network
+
+  # Backend API Service
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    container_name: dop-backend
+    environment:
+      # Application
+      APP_NAME: "Data Observability Platform"
+      APP_VERSION: "0.1.0"
+      DEBUG: "False"
+      
+      # API
+      API_V1_PREFIX: "/api/v1"
+      
+      # PostgreSQL Database
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: dop_user
+      POSTGRES_PASSWORD: dop_password
+      POSTGRES_DB: data_observability
+      DATABASE_URL: "postgresql://dop_user:dop_password@postgres:5432/data_observability"
+      
+      # Redis Cache
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+      REDIS_URL: "redis://redis:6379/0"
+      
+      # MinIO Object Storage
+      MINIO_ENDPOINT: "minio:9000"
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      MINIO_SECURE: "False"
+      MINIO_BUCKET_RAW: raw-data
+      MINIO_BUCKET_PROCESSED: processed-data
+      MINIO_BUCKET_AUDIT: audit-data
+      
+      # Celery
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+      
+      # Airflow
+      AIRFLOW_API_URL: "http://airflow-webserver:8080/api/v1"
+      AIRFLOW_USERNAME: admin
+      AIRFLOW_PASSWORD: admin123
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./backend/logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - dop-network
+    restart: unless-stopped
+
+  # Celery Worker
+  celery-worker:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    container_name: dop-celery-worker
+    command: celery -A app.celery_app worker --loglevel=info
+    environment:
+      # Application
+      APP_NAME: "Data Observability Platform"
+      APP_VERSION: "0.1.0"
+      
+      # PostgreSQL Database
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: dop_user
+      POSTGRES_PASSWORD: dop_password
+      POSTGRES_DB: data_observability
+      DATABASE_URL: "postgresql://dop_user:dop_password@postgres:5432/data_observability"
+      
+      # Redis Cache
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+      REDIS_URL: "redis://redis:6379/0"
+      
+      # MinIO Object Storage
+      MINIO_ENDPOINT: "minio:9000"
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      MINIO_SECURE: "False"
+      MINIO_BUCKET_RAW: raw-data
+      MINIO_BUCKET_PROCESSED: processed-data
+      MINIO_BUCKET_AUDIT: audit-data
+      
+      # Celery
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+    volumes:
+      - ./backend:/app
+      - ./backend/logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    networks:
+      - dop-network
+    restart: unless-stopped
 
   # Airflow Webserver
   airflow-webserver:
@@ -122,8 +250,10 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+      start_period: 60s
     networks:
       - dop-network
+    restart: unless-stopped
 
   # Airflow Scheduler
   airflow-scheduler:
@@ -150,8 +280,36 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+      start_period: 60s
     networks:
       - dop-network
+    restart: unless-stopped
+
+  # Frontend Web Application
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    container_name: dop-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:8000"
+      NEXT_PUBLIC_API_VERSION: "/api/v1"
+      NEXT_PUBLIC_APP_NAME: "Data Observability Platform"
+      NEXT_PUBLIC_APP_VERSION: "0.1.0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})\""]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - dop-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:

@@ -4,6 +4,7 @@ import MetricCard from '../components/MetricCard';
 import CacheStatusIndicator from '../components/CacheStatusIndicator';
 import PipelinePerformanceSection from '../components/PipelinePerformanceSection';
 import CacheMetricsCard from '../components/CacheMetricsCard';
+import StorageProviderStatus from '../components/StorageProviderStatus';
 
 export default function Dashboard() {
   // Placeholder metrics data
@@ -78,6 +79,11 @@ export default function Dashboard() {
       {/* Cache Status Indicator */}
       <div className="mb-6">
         <CacheStatusIndicator />
+      </div>
+
+      {/* Storage Provider Status */}
+      <div className="mb-6">
+        <StorageProviderStatus />
       </div>
 
       {/* Cache Monitoring Section */}

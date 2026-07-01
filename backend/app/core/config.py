@@ -27,7 +27,10 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str = ""
     REDIS_URL: str = "redis://localhost:6379/0"
     
-    # MinIO Object Storage
+    # Storage Provider Configuration
+    STORAGE_PROVIDER: str = "minio"  # Options: "minio" or "s3"
+    
+    # MinIO Object Storage (local development)
     MINIO_ENDPOINT: str = "localhost:9000"
     MINIO_ACCESS_KEY: str = "minioadmin"
     MINIO_SECRET_KEY: str = "minioadmin123"
@@ -35,6 +38,14 @@ class Settings(BaseSettings):
     MINIO_BUCKET_RAW: str = "raw-data"
     MINIO_BUCKET_PROCESSED: str = "processed-data"
     MINIO_BUCKET_AUDIT: str = "audit-data"
+    
+    # AWS S3 Object Storage (production)
+    AWS_ACCESS_KEY_ID: str = ""
+    AWS_SECRET_ACCESS_KEY: str = ""
+    AWS_REGION: str = "us-east-1"
+    S3_BUCKET_RAW: str = "dop-raw-data"
+    S3_BUCKET_PROCESSED: str = "dop-processed-data"
+    S3_BUCKET_AUDIT: str = "dop-audit-data"
     
     # Local PySpark Configuration
     SPARK_APP_NAME: str = "DataObservabilityPlatform"

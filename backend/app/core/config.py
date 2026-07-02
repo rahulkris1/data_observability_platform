@@ -54,6 +54,20 @@ class Settings(BaseSettings):
     SPARK_EXECUTOR_MEMORY: str = "2g"
     SPARK_LOG_LEVEL: str = "WARN"  # Reduce verbosity for local development
     
+    # Execution Mode Configuration
+    EXECUTION_MODE: str = "local"  # Options: "local" or "glue"
+    
+    # AWS Glue Configuration
+    GLUE_JOB_NAME: str = ""  # e.g., "dop-dataset-ingestion-job"
+    GLUE_IAM_ROLE: str = ""  # e.g., "arn:aws:iam::ACCOUNT_ID:role/GlueServiceRole"
+    GLUE_SCRIPT_BUCKET: str = ""  # e.g., "dop-glue-scripts"
+    GLUE_WORKER_TYPE: str = "G.1X"  # Options: G.1X, G.2X, Standard
+    GLUE_NUMBER_OF_WORKERS: int = 2
+    GLUE_TIMEOUT: int = 2880  # minutes (48 hours)
+    GLUE_MAX_RETRIES: int = 1
+    GLUE_SECURITY_CONFIGURATION: str = ""  # Optional
+    GLUE_TEMP_DIR: str = ""  # e.g., "s3://dop-glue-temp/"
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

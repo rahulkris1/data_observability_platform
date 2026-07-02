@@ -7,6 +7,7 @@ from app.api.profiling_routes import router as profiling_router
 from app.api.schema_drift_routes import router as schema_drift_router
 from app.api.health_routes import router as health_router
 from app.api.storage_routes import router as storage_router
+from app.api.glue_routes import router as glue_router
 from app.observability import configure_logging, get_metrics_service
 from app.observability.middleware import RequestLoggingMiddleware
 
@@ -34,6 +35,7 @@ app.include_router(profiling_router)
 app.include_router(schema_drift_router)
 app.include_router(health_router)
 app.include_router(storage_router, prefix="/api/v1/storage", tags=["storage"])
+app.include_router(glue_router, prefix="/api/v1", tags=["glue"])
 
 ingestion_service = IngestionService()
 

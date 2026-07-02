@@ -22,8 +22,10 @@ from app.services.ingestion_service import IngestionService
 from app.services.validation_aggregator import ValidationAggregator
 from app.services.audit_service import AuditService
 from app.services.dag_execution_service import DAGExecutionService
+from app.services.glue_service import get_glue_service
 from app.validators import SchemaValidator, NullValidator, DatatypeValidator, ChecksumValidator, ColumnExistenceValidator
 from app.core.database import get_db
+from app.core.config import settings
 from app.utils.spark_utils import get_spark_session
 
 
@@ -384,6 +386,153 @@ def pipeline_completion(**context):
         raise
 
 
+def trigger_glue_job(**context):
+    """
+    Task: Trigger AWS Glue job for cloud-based data processing.
+    
+    This task runs only when EXECUTION_MODE is set to 'glue'.
+    """
+    dag_run_id = context['dag_run'].run_id
+    task_start = datetime.utcnow()
+    
+    print(f"Triggering Glue job for DAG run: {dag_run_id}")
+    
+    try:
+        # Check execution mode
+        if settings.EXECUTION_MODE.lower() != 'glue':
+            print(f"⚠ Execution mode is '{settings.EXECUTION_MODE}', skipping Glue job trigger")
+            return {"status": "skipped", "reason": "execution_mode_not_glue"}
+        
+        # Get Glue service
+        glue_service = get_glue_service()
+        
+        if not glue_service.is_available():
+            raise RuntimeError("Glue service is not available. Check AWS credentials and configuration.")
+        
+        # Get DAG run configuration
+        conf = context['dag_run'].conf or {}
+        source_path = conf.get('source_path', f"s3://{settings.S3_BUCKET_RAW}/")
+        file_format = conf.get('file_format', 'json')
+        
+        # Prepare Glue job arguments
+        job_arguments = {
+            '--SOURCE_PATH': source_path,
+            '--FILE_FORMAT': file_format,
+            '--OUTPUT_FORMAT': 'parquet',
+            '--DAG_RUN_ID': dag_run_id
+        }
+        
+        print(f"Starting Glue job: {settings.GLUE_JOB_NAME}")
+        print(f"  Source: {source_path}")
+        print(f"  Format: {file_format}")
+        
+        # Start Glue job run
+        job_run_id = glue_service.start_job_run(job_arguments=job_arguments)
+        
+        if not job_run_id:
+            raise RuntimeError("Failed to start Glue job run")
+        
+        print(f"✓ Glue job started successfully")
+        print(f"  Job Run ID: {job_run_id}")
+        
+        # Store job run ID for monitoring
+        context['task_instance'].xcom_push(key='glue_job_run_id', value=job_run_id)
+        
+        # Monitor job status (optional - can be done in separate task)
+        import time
+        max_wait_time = 300  # 5 minutes
+        check_interval = 30  # 30 seconds
+        elapsed = 0
+        
+        while elapsed < max_wait_time:
+            status = glue_service.get_job_run_status(job_run_id=job_run_id)
+            
+            if status:
+                state = status.get('state')
+                print(f"  Glue job state: {state}")
+                
+                if state in ['SUCCEEDED', 'FAILED', 'STOPPED', 'TIMEOUT']:
+                    break
+            
+            time.sleep(check_interval)
+            elapsed += check_interval
+        
+        # Get final status
+        final_status = glue_service.get_job_run_status(job_run_id=job_run_id)
+        
+        if final_status:
+            final_state = final_status.get('state')
+            execution_time = final_status.get('execution_time', 0)
+            
+            print(f"✓ Glue job final state: {final_state}")
+            print(f"  Execution time: {execution_time}s")
+            
+            if final_state == 'FAILED':
+                error_msg = final_status.get('error_message', 'Unknown error')
+                raise RuntimeError(f"Glue job failed: {error_msg}")
+        
+        task_end = datetime.utcnow()
+        duration = (task_end - task_start).total_seconds()
+        print(f"✓ Glue job task completed in {duration:.2f}s")
+        
+        return {
+            "status": "success",
+            "job_run_id": job_run_id,
+            "execution_time": execution_time,
+            "glue_state": final_state
+        }
+    
+    except Exception as e:
+        print(f"✗ Glue job trigger failed: {e}")
+        log_dag_execution(dag_run_id, 'failed', **context)
+        raise
+        
+        engine = create_engine('postgresql://dop_user:dop_password@postgres:5432/data_observability')
+        SessionLocal = sessionmaker(bind=engine)
+        db = SessionLocal()
+        
+        try:
+            service = DAGExecutionService(db)
+            service.update_execution_record(
+                dag_run_id=dag_run_id,
+                state='success',
+                end_date=datetime.utcnow(),
+                total_tasks=4,
+                completed_tasks=4,
+                failed_tasks=0,
+                task_details={
+                    'ingestion': {
+                        'status': 'success',
+                        'records': ingestion_result.get('record_count', 0) if ingestion_result else 0
+                    },
+                    'validation': {
+                        'status': 'success',
+                        'overall_status': validation_result.get('overall_status') if validation_result else 'unknown',
+                        'passed': validation_result.get('passed_validations', 0) if validation_result else 0,
+                        'failed': validation_result.get('failed_validations', 0) if validation_result else 0
+                    },
+                    'audit': {
+                        'status': 'success'
+                    }
+                }
+            )
+            
+            print(f"✓ Pipeline completed successfully")
+            print(f"  DAG run: {dag_run_id}")
+            print(f"  Records ingested: {ingestion_result.get('record_count', 0) if ingestion_result else 0}")
+            print(f"  Validation status: {validation_result.get('overall_status') if validation_result else 'unknown'}")
+        
+        finally:
+            db.close()
+        
+        return {"status": "completed"}
+    
+    except Exception as e:
+        print(f"✗ Pipeline completion failed: {e}")
+        log_dag_execution(dag_run_id, 'failed', **context)
+        raise
+
+
 # Create DAG
 with DAG(
     dag_id='data_quality_pipeline',
@@ -446,7 +595,24 @@ with DAG(
         """,
     )
     
-    # Task 4: Pipeline completion
+    # Task 4: Trigger Glue Job (optional, runs in cloud mode)
+    glue_job_task = PythonOperator(
+        task_id='trigger_glue_job',
+        python_callable=trigger_glue_job,
+        provide_context=True,
+        doc_md="""
+        ## Trigger AWS Glue Job
+        
+        Triggers AWS Glue job for cloud-based processing.
+        
+        - Runs only when EXECUTION_MODE='glue'
+        - Starts Glue job with configured parameters
+        - Monitors job execution status
+        - Skipped in local mode
+        """,
+    )
+    
+    # Task 5: Pipeline completion
     completion_task = PythonOperator(
         task_id='pipeline_completion',
         python_callable=pipeline_completion,
@@ -462,5 +628,11 @@ with DAG(
         """,
     )
     
-    # Define task dependencies: ingestion → validation → audit → completion
+    # Define task dependencies
+    # Local mode: ingestion → validation → audit → completion
+    # Glue mode: ingestion → glue_job → validation → audit → completion
     ingest_task >> validate_task >> audit_task >> completion_task
+    
+    # Add Glue job trigger as parallel task after ingestion
+    # It can run alongside local validation for flexibility
+    ingest_task >> glue_job_task >> completion_task

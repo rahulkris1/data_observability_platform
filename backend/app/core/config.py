@@ -68,6 +68,24 @@ class Settings(BaseSettings):
     GLUE_SECURITY_CONFIGURATION: str = ""  # Optional
     GLUE_TEMP_DIR: str = ""  # e.g., "s3://dop-glue-temp/"
     
+    # AWS CloudWatch Configuration
+    CLOUDWATCH_ENABLED: bool = False  # Enable CloudWatch metrics and logs
+    CLOUDWATCH_NAMESPACE: str = "DataObservabilityPlatform"
+    CLOUDWATCH_LOG_GROUP: str = "/aws/dataobservability/application"
+    
+    # Snowflake Data Warehouse Configuration
+    SNOWFLAKE_ACCOUNT: str = ""  # e.g., "xy12345.us-east-1"
+    SNOWFLAKE_USER: str = ""
+    SNOWFLAKE_PASSWORD: str = ""
+    SNOWFLAKE_WAREHOUSE: str = ""  # e.g., "COMPUTE_WH"
+    SNOWFLAKE_DATABASE: str = ""  # e.g., "DATA_OBSERVABILITY"
+    SNOWFLAKE_SCHEMA: str = "PUBLIC"
+    SNOWFLAKE_ROLE: str = ""  # e.g., "ACCOUNTADMIN"
+    
+    # Airflow AWS Connection Configuration
+    AIRFLOW_AWS_CONN_ID: str = "aws_default"
+    AIRFLOW_SNOWFLAKE_CONN_ID: str = "snowflake_default"
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

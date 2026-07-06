@@ -9,6 +9,9 @@ from fastapi import APIRouter, Query, HTTPException
 from pydantic import BaseModel, Field
 
 from app.observability import parse_log_file, get_log_stats, get_metrics_service
+from app.services.cloudwatch_metrics_service import cloudwatch_metrics_service
+from app.services.cloudwatch_logs_service import cloudwatch_logs_service
+from app.core.config import settings
 
 
 router = APIRouter(prefix="/api/v1/observability", tags=["observability"])
@@ -48,6 +51,27 @@ class MetricsResponse(BaseModel):
     counters: dict
     histograms: dict
     timestamp: str
+
+
+class CloudWatchStatusResponse(BaseModel):
+    """Response for CloudWatch status."""
+    metrics_enabled: bool
+    metrics_available: bool
+    logs_enabled: bool
+    logs_available: bool
+    namespace: Optional[str] = None
+    log_group: Optional[str] = None
+    region: Optional[str] = None
+    active_log_streams: int = 0
+    provider: str
+
+
+class MetricsProviderResponse(BaseModel):
+    """Response for metrics provider status."""
+    active_provider: str
+    cloudwatch_enabled: bool
+    local_enabled: bool
+    execution_mode: str
 
 
 @router.get("/logs", response_model=LogsResponse)
@@ -204,3 +228,52 @@ async def reset_metrics():
     metrics_service.reset_metrics()
     
     return {"message": "Metrics reset successfully"}
+
+
+@router.get("/cloudwatch/status", response_model=CloudWatchStatusResponse)
+async def get_cloudwatch_status():
+    """
+    Get CloudWatch service status including metrics and logs.
+    
+    Returns:
+        CloudWatch status information
+    """
+    metrics_status = cloudwatch_metrics_service.get_metrics_status()
+    logs_status = cloudwatch_logs_service.get_logs_status()
+    
+    return CloudWatchStatusResponse(
+        metrics_enabled=metrics_status["enabled"],
+        metrics_available=metrics_status["available"],
+        logs_enabled=logs_status["enabled"],
+        logs_available=logs_status["available"],
+        namespace=metrics_status.get("namespace"),
+        log_group=logs_status.get("log_group"),
+        region=metrics_status.get("region"),
+        active_log_streams=logs_status.get("active_streams", 0),
+        provider=metrics_status.get("provider", "local")
+    )
+
+
+@router.get("/metrics/provider", response_model=MetricsProviderResponse)
+async def get_metrics_provider():
+    """
+    Get active metrics provider status.
+    
+    Returns:
+        Information about active metrics provider (CloudWatch or local)
+    """
+    cloudwatch_enabled = settings.CLOUDWATCH_ENABLED
+    cloudwatch_available = cloudwatch_metrics_service.is_available()
+    
+    # Determine active provider
+    if cloudwatch_available:
+        active_provider = "cloudwatch"
+    else:
+        active_provider = "local"
+    
+    return MetricsProviderResponse(
+        active_provider=active_provider,
+        cloudwatch_enabled=cloudwatch_enabled,
+        local_enabled=True,  # Local metrics always available
+        execution_mode=settings.EXECUTION_MODE
+    )

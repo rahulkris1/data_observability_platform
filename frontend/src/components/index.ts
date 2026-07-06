@@ -27,6 +27,9 @@ export { default as ColumnDistributionChart } from './ColumnDistributionChart';
 export { default as HealthScoreWidget } from './HealthScoreWidget';
 export { default as PipelineScoreCard } from './PipelineScoreCard';
 export { default as HealthTrendChart } from './HealthTrendChart';
+export { default as CloudWatchStatusCard } from './CloudWatchStatusCard';
+export { default as MetricsProviderStatus } from './MetricsProviderStatus';
+export { default as CloudObservabilitySection } from './CloudObservabilitySection';
 
 export type { Column } from './Table';
 export type { IntegrityViolation, FailedRow } from './IntegrityViolationsTable';

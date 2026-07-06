@@ -19,6 +19,12 @@ celery[redis]
 minio
 boto3  # AWS S3 support
 
+# AWS CloudWatch (included in boto3)
+# AWS Glue (included in boto3)
+
+# Snowflake Data Warehouse
+snowflake-connector-python
+
 # Local PySpark for data validation
 pyspark==3.5.0
 pyarrow

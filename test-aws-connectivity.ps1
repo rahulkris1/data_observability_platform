@@ -33,9 +33,9 @@ Set-Location -Path ".."
 
 Write-Host ""
 if ($exitCode -eq 0) {
-    Write-Host "✓ Connectivity validation passed!" -ForegroundColor Green
+    Write-Host "Success: Connectivity validation passed!" -ForegroundColor Green
 } else {
-    Write-Host "✗ Connectivity validation failed!" -ForegroundColor Red
+    Write-Host "Failed: Connectivity validation failed!" -ForegroundColor Red
     Write-Host "Please check your AWS and Snowflake configuration in .env" -ForegroundColor Yellow
 }
 

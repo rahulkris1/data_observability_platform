@@ -5,6 +5,9 @@ import CacheStatusIndicator from '../components/CacheStatusIndicator';
 import PipelinePerformanceSection from '../components/PipelinePerformanceSection';
 import CacheMetricsCard from '../components/CacheMetricsCard';
 import StorageProviderStatus from '../components/StorageProviderStatus';
+import CloudWatchStatusCard from '../components/CloudWatchStatusCard';
+import MetricsProviderStatus from '../components/MetricsProviderStatus';
+import CloudObservabilitySection from '../components/CloudObservabilitySection';
 
 export default function Dashboard() {
   // Placeholder metrics data
@@ -84,6 +87,17 @@ export default function Dashboard() {
       {/* Storage Provider Status */}
       <div className="mb-6">
         <StorageProviderStatus />
+      </div>
+
+      {/* CloudWatch and Metrics Provider Status */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <CloudWatchStatusCard />
+        <MetricsProviderStatus />
+      </div>
+
+      {/* Cloud Observability Section */}
+      <div className="mb-8">
+        <CloudObservabilitySection />
       </div>
 
       {/* Cache Monitoring Section */}

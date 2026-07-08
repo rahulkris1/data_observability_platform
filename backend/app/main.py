@@ -10,6 +10,12 @@ from app.api.storage_routes import router as storage_router
 from app.api.glue_routes import router as glue_router
 from app.observability import configure_logging, get_metrics_service
 from app.observability.middleware import RequestLoggingMiddleware
+from app.core.exception_handler import (
+    configure_exception_handlers,
+    build_success_response,
+    BadRequestException,
+    ServiceUnavailableException
+)
 
 # Configure logging on startup
 configure_logging(
@@ -23,6 +29,9 @@ app = FastAPI(
     description="Basic API for data observability",
     version="0.1.0"
 )
+
+# Configure centralized exception handling
+configure_exception_handlers(app)
 
 # Add middleware
 metrics_service = get_metrics_service()
@@ -43,13 +52,19 @@ ingestion_service = IngestionService()
 @app.get("/")
 async def root():
     """Root endpoint"""
-    return {"message": "Data Observability Platform API"}
+    return build_success_response(
+        data={"message": "Data Observability Platform API"},
+        message="Welcome to Data Observability Platform"
+    )
 
 
 @app.get("/health")
 async def health():
     """Health check endpoint"""
-    return {"status": "healthy"}
+    return build_success_response(
+        data={"status": "healthy"},
+        message="Service is healthy"
+    )
 
 
 @app.post("/api/v1/ingest")
@@ -58,10 +73,13 @@ async def ingest_file(file: UploadFile = File(...)):
     try:
         file_bytes = await file.read()
         summary = ingestion_service.ingest_dataset(file.filename, file_bytes, file.content_type)
-        return {"success": True, "result": summary}
+        return build_success_response(
+            data=summary,
+            message="File ingested successfully"
+        )
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+        raise BadRequestException(str(exc))
     except RuntimeError as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        raise ServiceUnavailableException(str(exc))
     except Exception as exc:
-        raise HTTPException(status_code=500, detail="Unexpected ingestion error")
+        raise ServiceUnavailableException("Unexpected ingestion error")

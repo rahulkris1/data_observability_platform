@@ -98,7 +98,7 @@ const ValidationRetryPage: React.FC = () => {
                 Manual Retry System
               </h3>
               <div className="text-sm text-blue-800 space-y-1">
-                <p>• All retries are <strong>manual</strong> - click the "Retry" button to re-run a failed validation</p>
+                <p>• All retries are <strong>manual</strong> - click the &quot;Retry&quot; button to re-run a failed validation</p>
                 <p>• Maximum of 3 retry attempts per validation</p>
                 <p>• Retry history is tracked in PostgreSQL for audit purposes</p>
                 <p>• No automatic retries, Celery, or Airflow tasks are used</p>

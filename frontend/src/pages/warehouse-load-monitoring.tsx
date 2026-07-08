@@ -395,7 +395,7 @@ export default function WarehouseLoadMonitoring() {
             <h4 className="text-sm font-medium text-yellow-800">Manual Retry Policy</h4>
             <p className="text-sm text-yellow-700 mt-1">
               This system does NOT perform automatic retries. All failed loads must be validated manually before retry. 
-              Use the "Validate for Retry" button to approve loads for manual retry execution.
+              Use the &quot;Validate for Retry&quot; button to approve loads for manual retry execution.
             </p>
           </div>
         </div>

@@ -104,7 +104,12 @@ export default function ValidationPage() {
                 Running...
               </>
             ) : (
-              <>/Error Alert */}
+              <>Run Validations</>
+            )}
+          </button>
+        </div>
+
+        {/* Error Alert */}
         {showAlert && !error && (
           <Alert
             variant="info"

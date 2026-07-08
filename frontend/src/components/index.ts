@@ -30,6 +30,8 @@ export { default as HealthTrendChart } from './HealthTrendChart';
 export { default as CloudWatchStatusCard } from './CloudWatchStatusCard';
 export { default as MetricsProviderStatus } from './MetricsProviderStatus';
 export { default as CloudObservabilitySection } from './CloudObservabilitySection';
+export { default as ToastNotification } from './ToastNotification';
+export { default as FallbackUI, LoadingState, EmptyState, ErrorState } from './FallbackUI';
 
 export type { Column } from './Table';
 export type { IntegrityViolation, FailedRow } from './IntegrityViolationsTable';
@@ -37,3 +39,4 @@ export type { LogFilters } from './LogsTable';
 export type { LoadStatus } from './LoadStatusIndicator';
 export type { LoadHistoryRecord } from './LoadHistoryTable';
 export type { FailedLoad, FailedLoadWithDetails } from './FailedLoadSection';
+export type { FallbackUIProps } from './FallbackUI';

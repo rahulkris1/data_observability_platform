@@ -3,7 +3,7 @@
  */
 
 import authService from '../authService'
-import { apiClient } from '../apiClient'
+import apiClient from '../apiClient'
 
 // Mock apiClient
 jest.mock('../apiClient', () => ({

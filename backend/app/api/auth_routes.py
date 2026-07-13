@@ -12,12 +12,13 @@ from app.schemas.auth_schema import (
     UserResponse
 )
 from app.api.auth_middleware import get_current_user, security
+from app.core.exception_handler import build_success_response
 
 
 router = APIRouter(prefix="/api/v1/auth", tags=["Authentication"])
 
 
-@router.post("/login", response_model=AuthResponse)
+@router.post("/login")
 async def login(
     login_request: LoginRequest,
     db: Session = Depends(get_db)
@@ -52,12 +53,17 @@ async def login(
     # Generate token
     access_token, expires_at = auth_service.create_token_for_user(user)
     
-    return AuthResponse(
+    response_data = AuthResponse(
         access_token=access_token,
         token_type="bearer",
         user_email=user.email,
         user_role=user.role.value,
         expires_at=expires_at
+    )
+    
+    return build_success_response(
+        data=response_data.dict(),
+        message="Login successful"
     )
 
 

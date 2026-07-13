@@ -8,13 +8,24 @@ import time
 import sys
 from pathlib import Path
 
+# Try to import airflow, skip tests if not available
+try:
+    from airflow.models import DagBag, TaskInstance, DagRun
+    from airflow.utils.state import State
+    from airflow.utils.types import DagRunType
+    AIRFLOW_AVAILABLE = True
+except ImportError:
+    AIRFLOW_AVAILABLE = False
+
+# Skip all tests in this module if airflow is not installed
+pytestmark = pytest.mark.skipif(
+    not AIRFLOW_AVAILABLE,
+    reason="Airflow not installed. Install with: pip install apache-airflow"
+)
+
 # Add airflow dags to path
 AIRFLOW_DAGS = Path(__file__).resolve().parents[3] / "airflow" / "dags"
 sys.path.insert(0, str(AIRFLOW_DAGS))
-
-from airflow.models import DagBag, TaskInstance, DagRun
-from airflow.utils.state import State
-from airflow.utils.types import DagRunType
 
 
 @pytest.fixture(scope="module")

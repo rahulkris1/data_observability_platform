@@ -228,3 +228,7 @@ class WarehouseAuditLogger:
             'total_records_failed': total_records_failed,
             'success_rate': (completed_loads / total_loads * 100) if total_loads > 0 else 0
         }
+
+
+# Backward compatibility alias
+AuditLogger = WarehouseAuditLogger

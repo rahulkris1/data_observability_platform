@@ -1,4 +1,5 @@
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.services.ingestion_service import IngestionService
 from app.api.audit_logs import router as audit_router
@@ -8,6 +9,7 @@ from app.api.schema_drift_routes import router as schema_drift_router
 from app.api.health_routes import router as health_router
 from app.api.storage_routes import router as storage_router
 from app.api.glue_routes import router as glue_router
+from app.api.auth_routes import router as auth_router
 from app.observability import configure_logging, get_metrics_service
 from app.observability.middleware import RequestLoggingMiddleware
 from app.core.exception_handler import (
@@ -33,11 +35,21 @@ app = FastAPI(
 # Configure centralized exception handling
 configure_exception_handlers(app)
 
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Add middleware
 metrics_service = get_metrics_service()
 app.add_middleware(RequestLoggingMiddleware, metrics_service=metrics_service)
 
 # Include routers
+app.include_router(auth_router)  # Authentication routes
 app.include_router(audit_router)
 app.include_router(observability_router)
 app.include_router(profiling_router)

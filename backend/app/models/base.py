@@ -5,6 +5,9 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from app.core.database import Base as SQLAlchemyBase
 
+# Re-export Base for backward compatibility
+Base = SQLAlchemyBase
+
 
 class BaseModel(SQLAlchemyBase):
     """Base model with common fields for all database models

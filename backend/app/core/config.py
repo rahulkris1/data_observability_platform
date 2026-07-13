@@ -18,7 +18,9 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = "dop_user"
     POSTGRES_PASSWORD: str = "dop_password"
     POSTGRES_DB: str = "data_observability"
-    DATABASE_URL: str = "postgresql://dop_user:dop_password@localhost:5432/data_observability"
+    # Use SQLite for local development (no Docker needed)
+    DATABASE_URL: str = "sqlite:///./data_observability.db"
+    # For PostgreSQL: "postgresql://dop_user:dop_password@localhost:5432/data_observability"
     
     # Redis Cache
     REDIS_HOST: str = "localhost"

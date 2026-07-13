@@ -20,6 +20,28 @@ from app.models.warehouse_tables import (
 logger = logging.getLogger(__name__)
 
 
+class WarehouseService:
+    """Unified Warehouse Service combining read and write operations"""
+    
+    def __init__(self, db: Session):
+        """Initialize warehouse service
+        
+        Args:
+            db: Database session
+        """
+        self.db = db
+        self.read_service = WarehouseReadService(db)
+        self.write_service = WarehouseWriteService(db)
+    
+    def __getattr__(self, name):
+        """Delegate method calls to read or write service"""
+        if hasattr(self.read_service, name):
+            return getattr(self.read_service, name)
+        elif hasattr(self.write_service, name):
+            return getattr(self.write_service, name)
+        raise AttributeError(f"WarehouseService has no attribute '{name}'")
+
+
 class WarehouseReadService:
     """Service for reading data from the warehouse"""
     

@@ -3,7 +3,7 @@
 import logging
 import os
 import sys
-from typing import Optional
+from typing import Optional, Dict, Any
 from pyspark.sql import SparkSession
 from app.core.config import settings
 
@@ -164,6 +164,47 @@ def get_spark() -> SparkSession:
     Returns:
         Active SparkSession instance
     """
+    return SparkSessionManager.get_session()
+
+
+def get_spark_session(
+    app_name: Optional[str] = None,
+    master: Optional[str] = None,
+    config: Optional[Dict[str, Any]] = None
+) -> SparkSession:
+    """
+    Create or get a SparkSession with optional custom configuration.
+    
+    Args:
+        app_name: Application name (overrides default)
+        master: Spark master URL (overrides default)
+        config: Additional Spark configuration options
+    
+    Returns:
+        Configured SparkSession instance
+    """
+    # If custom configuration is provided, create a new session
+    if app_name or master or config:
+        builder = SparkSession.builder
+        
+        if app_name:
+            builder = builder.appName(app_name)
+        else:
+            builder = builder.appName(settings.SPARK_APP_NAME)
+        
+        if master:
+            builder = builder.master(master)
+        elif settings.EXECUTION_MODE.lower() == "local":
+            builder = builder.master(settings.SPARK_MASTER)
+        
+        # Apply additional configurations
+        if config:
+            for key, value in config.items():
+                builder = builder.config(key, value)
+        
+        return builder.getOrCreate()
+    
+    # Otherwise, use the singleton session
     return SparkSessionManager.get_session()
 
 

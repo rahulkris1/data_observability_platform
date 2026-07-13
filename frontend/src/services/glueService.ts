@@ -4,7 +4,7 @@
  * Provides methods for interacting with AWS Glue job management APIs.
  */
 
-import { apiClient } from './apiClient';
+import apiClient from './apiClient';
 
 export interface GlueJobRun {
   job_run_id: string;

@@ -109,7 +109,15 @@ export function useAuth() {
 
       return { success: true };
     } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Login failed';
+      // Handle both FastAPI's "detail" field and custom "error" field
+      const errorMessage = 
+        error.response?.data?.detail || 
+        error.response?.data?.error || 
+        error.message || 
+        'Login failed';
+      
+      console.error('Login error:', error);
+      console.error('Error response:', error.response?.data);
       
       setAuthState(prev => ({
         ...prev,

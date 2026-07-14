@@ -14,6 +14,7 @@ from app.models.profiling_result import ProfilingResult
 from app.models.schema_version import SchemaVersion
 from app.models.schema_drift_history import SchemaDriftHistory
 from app.models.health_score import HealthScore
+from app.models.retry_queue import RetryQueue
 
 __all__ = [
     "Base", 
@@ -26,5 +27,6 @@ __all__ = [
     "ProfilingResult",
     "SchemaVersion",
     "SchemaDriftHistory",
-    "HealthScore"
+    "HealthScore",
+    "RetryQueue"
 ]

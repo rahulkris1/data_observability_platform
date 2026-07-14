@@ -69,7 +69,7 @@ class ValidationHistoryItem(BaseModel):
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
-        orm_mode = True
+        from_attributes = True
 
 
 class ValidationMetrics(BaseModel):

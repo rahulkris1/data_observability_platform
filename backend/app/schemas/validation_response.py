@@ -111,7 +111,7 @@ class AuditHistoryItem(BaseModel):
     error_summary: Optional[str] = Field(None, description="Summary of errors")
     
     class Config:
-        orm_mode = True
+        from_attributes = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }

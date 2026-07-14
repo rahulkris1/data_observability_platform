@@ -119,7 +119,7 @@ class IntegrityViolation(BaseModel):
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
-        orm_mode = True
+        from_attributes = True
 
 
 class IntegrityViolationsResponse(BaseModel):

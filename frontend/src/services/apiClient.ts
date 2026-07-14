@@ -73,6 +73,16 @@ apiClient.interceptors.response.use(
     // Extract data from standardized response
     const standardResponse = response.data as StandardResponse;
     
+    // Debug logging
+    if (process.env.NODE_ENV === 'development') {
+      console.log('API Response:', {
+        url: response.config.url,
+        status: response.status,
+        success: standardResponse.success,
+        hasData: standardResponse.data !== undefined
+      });
+    }
+    
     if (standardResponse.success === false) {
       // Backend returned an error in successful HTTP response
       return Promise.reject({

@@ -71,12 +71,10 @@ export default function ValidationPage() {
   
   const handleCardClick = (summary: ValidationSummary) => {
     console.log('Card clicked:', summary);
-    // Future: Navigate to detailed validation view
   };
   
   const handleRowClick = (result: ValidationResult) => {
     console.log('Row clicked:', result);
-    // Future: Show detailed validation results modal
   };
   
   return (
@@ -104,35 +102,105 @@ export default function ValidationPage() {
                 Running...
               </>
             ) : (
-              <>Run Validations</>
+              'Run Validations'
             )}
           </button>
         </div>
-
-        {/* Error Alert */}
-        {showAlert && !error && (
+        
+        {/* Info Alert */}
+        {showAlert && (
           <Alert
             variant="info"
-            title="Validation System Ready"
-            message="Select a dataset and click 'Run Validations' to execute PySpark-based validators."
-            dismissible
-            onClose={() => setShowAlert(false)}
-          />
+            onDismiss={() => setShowAlert(false)}
+          >
+            <p className="text-sm text-gray-700">
+              <span className="font-medium">Ready:</span> Select a dataset from MinIO and click "Run Validations" to execute PySpark validators.
+              Results will be stored in PostgreSQL and displayed here.
+            </p>
+          </Alert>
         )}
         
+        {/* Error Alert */}
         {error && (
           <Alert
             variant="error"
-            title="Validation Failed"
-            message={error}
-            dismissible
-            onClose={() => setError(null)}
-          />
+            onDismiss={() => setError(null)}
+          >
+            <p className="text-sm text-red-700">{error}</p>
+          </Alert>
         )}
         
+        {/* Success Alert */}
         {validationResults && (
           <Alert
             variant={validationResults.overall_passed ? 'success' : 'warning'}
+            onDismiss={() => setValidationResults(null)}
+          >
+            <p className="text-sm">
+              {validationResults.overall_passed 
+                ? `All validations passed for ${validationResults.dataset_name}`
+                : `Some validations failed for ${validationResults.dataset_name}`
+              }
+            </p>
+          </Alert>
+        )}
+        
+        {/* Dataset Selection */}
+        <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Dataset</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="dataset" className="block text-sm font-medium text-gray-700 mb-2">
+                Dataset
+              </label>
+              <select
+                id="dataset"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={selectedDataset}
+                onChange={(e) => setSelectedDataset(e.target.value)}
+              >
+                <option value="">Select a dataset...</option>
+                <option value="customers.csv">customers.csv</option>
+                <option value="orders.csv">orders.csv</option>
+                <option value="products.json">products.json</option>
+              </select>
+            </div>
+            
+            <div>
+              <label htmlFor="validator" className="block text-sm font-medium text-gray-700 mb-2">
+                Validator
+              </label>
+              <select
+                id="validator"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option>All Validators</option>
+                <option>Schema Validator</option>
+                <option>Null Validator</option>
+                <option>Checksum Validator</option>
+              </select>
+            </div>
+            
+            <div>
+              <label htmlFor="schedule" className="block text-sm font-medium text-gray-700 mb-2">
+                Schedule
+              </label>
+              <select
+                id="schedule"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option>Manual</option>
+                <option>Hourly</option>
+                <option>Daily</option>
+                <option>Weekly</option>
+              </select>
+            </div>
+          </div>
+        </section>
+        
+        {/* Validation Summary Cards */}
+        <section>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Validation Summary</h2>
           {results.length > 0 ? (
             <ValidationSummaryCards
               summaries={summaries}
@@ -147,86 +215,12 @@ export default function ValidationPage() {
               <h3 className="mt-2 text-sm font-medium text-gray-900">No validation results</h3>
               <p className="mt-1 text-sm text-gray-500">Select a dataset and run validations to see results</p>
             </div>
-          )}v>
-        
-        {/* Info Alert */}
-        {showAlert && (
-          <Alert
-            varivalue={selectedDataset}
-                onChange={(e) => setSelectedDataset(e.target.value)}
-              >
-                <option value="">Select a dataset...</option>
-                <option value="customers.csv">customers.csv</option>
-                <option value="orders.csv">orders.csv</option>
-                <option value="products.json">products
-        )}
-        
-        {/* Validation Summary Cards */}
-        <section>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Validation Summary</h2>
-          <ValidationSummaryCards
-            summaries={mockValidationSummaries}
-            onCardClick={handleCardClick}
-            loading={loading}
-          />
+          )}
         </section>
         
-        {/* Dataset Selection Placeholder */}
-        <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Dataset</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Dataset Selector */}
-            <div>
-              <label htmlFor="dataset" className="block text-sm font-medium text-gray-700 mb-2">
-                Dataset
-              </label>
-              <select
-                id="dataset"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                disabled
-              >
-                <option>Select a dataset...</option>
-                <option>user_activity.csv</option>
-                <option>transactions.parquet</option>
-                <option>customer_data.json</option>
-              </select>
-            </div>
-            
-            {/* Validator Selection */}
-            <div>
-              <label htmlFor="validator" className="block text-sm font-medium text-gray-700 mb-2">
-                Validator
-              </label>
-              <select
-                id="validator"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                disabled
-              >
-                <option>All Validators</option>
-                <option>Schema Validator</option>
-                <option>Null Validator</option>
-                <option>Checksum Validator</option>
-              </select>
-            </div>
-            
-            {/* Schedule */}
-            <div>
-              <label htmlFor="schedule" className="block text-sm font-medium text-gray-700 mb-2">
-                Schedule
-              </label>
-              <select
-                id="schedule"
-                className="w-full px-3blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-gray-700">
-              <span className="font-medium">Ready:</span> Select a dataset from MinIO and click "Run Validations" to execute PySpark validators.
-              Results will be stored in PostgreSQL and displayed here
-                <option>Hourly</option>
-                <option>Daily</option>
-                <option>Weekly</option>
-              </select>
-            </div>
-          </div>
-          Validation Results</h2>
+        {/* Validation Results Table */}
+        <section>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Validation Results</h2>
           {results.length > 0 ? (
             <ValidationResultsTable
               results={results}
@@ -241,43 +235,7 @@ export default function ValidationPage() {
               <h3 className="mt-2 text-sm font-medium text-gray-900">No results yet</h3>
               <p className="mt-1 text-sm text-gray-500">Run validations to see detailed results</p>
             </div>
-          )}</p>
-          </div>
-        </section>
-        
-        {/* Validation Results Table */}
-        <section>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Validation Results</h2>
-          <ValidationResultsTable
-            results={mockValidationResults}
-            onRowClick={handleRowClick}
-            loading={loading}
-          />
-        </section>
-        
-        {/* Getting Started */}
-        <section className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-3">Getting Started</h2>
-          <div className="space-y-3 text-sm text-gray-700">
-            <div className="flex items-start">
-              <svg className="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span><strong>Backend:</strong> Install PySpark dependencies with <code className="px-1.5 py-0.5 bg-white rounded text-xs font-mono">pip install -r backend/requirements.txt</code></span>
-            </div>
-            <div className="flex items-start">
-              <svg className="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span><strong>Verify Setup:</strong> Run <code className="px-1.5 py-0.5 bg-white rounded text-xs font-mono">python backend/verify_spark_session.py</code> to test SparkSession</span>
-            </div>
-            <div className="flex items-start">
-              <svg className="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span><strong>Test Validators:</strong> Run <code className="px-1.5 py-0.5 bg-white rounded text-xs font-mono">python backend/verify_validators.py</code> to test all validators</span>
-            </div>
-          </div>
+          )}
         </section>
       </div>
     </DashboardLayout>

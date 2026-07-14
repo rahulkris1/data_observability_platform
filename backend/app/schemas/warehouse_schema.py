@@ -188,7 +188,7 @@ class WarehouseLoadHistoryResponse(BaseModel):
     validation_summary: Optional[Dict[str, Any]] = Field(None, description="Validation summary")
     
     class Config:
-        orm_mode = True
+        from_attributes = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -241,7 +241,7 @@ class WarehouseProcessedDataResponse(BaseModel):
     load_timestamp: datetime = Field(..., description="Load timestamp")
     
     class Config:
-        orm_mode = True
+        from_attributes = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }

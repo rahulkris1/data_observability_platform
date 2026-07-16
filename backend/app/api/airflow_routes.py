@@ -3,7 +3,7 @@ Airflow API Routes
 Endpoints for Airflow monitoring and management
 """
 from fastapi import APIRouter, HTTPException, Query
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from app.services.airflow_service import AirflowService, AirflowHealth, DAGInfo, DAGRun
 
 router = APIRouter(prefix="/airflow", tags=["airflow"])
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/airflow", tags=["airflow"])
 airflow_service = AirflowService()
 
 
-@router.get("/health", response_model=Dict[str, any])
+@router.get("/health", response_model=Dict[str, Any])
 async def get_airflow_health():
     """Get Airflow health status"""
     health = airflow_service.get_health()

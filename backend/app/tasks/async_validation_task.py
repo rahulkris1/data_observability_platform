@@ -6,7 +6,6 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 
 from app.celery_app import celery_app
-from app.services.validation_log_service import get_validation_log_service
 from app.services.schema_contract_service import get_schema_contract_service
 from app.validators.validation_rules_engine import ValidationRulesEngine
 

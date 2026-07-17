@@ -7,6 +7,7 @@ from app.core.database import get_db
 from app.services.auth_service import AuthService
 from app.schemas.auth_schema import (
     LoginRequest,
+    RegisterRequest,
     AuthResponse,
     TokenVerificationResponse,
     UserResponse
@@ -18,6 +19,45 @@ from app.core.exception_handler import build_success_response
 router = APIRouter(prefix="/api/v1/auth", tags=["Authentication"])
 
 
+@router.post("/register", status_code=status.HTTP_201_CREATED)
+async def register(
+    register_request: RegisterRequest,
+    db: Session = Depends(get_db)
+):
+    """Register a new user
+    
+    Args:
+        register_request: User registration data
+        db: Database session
+        
+    Returns:
+        Success message
+        
+    Raises:
+        HTTPException: If user already exists
+    """
+    auth_service = AuthService(db)
+    
+    # Check if user already exists
+    try:
+        user = auth_service.register_user(
+            email=register_request.email,
+            password=register_request.password,
+            full_name=register_request.full_name,
+            username=register_request.username
+        )
+        
+        return build_success_response(
+            data={"email": user.email, "full_name": user.full_name},
+            message="User registered successfully"
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e)
+        )
+
+
 @router.post("/login")
 async def login(
     login_request: LoginRequest,
@@ -25,8 +65,11 @@ async def login(
 ):
     """Login endpoint - authenticate user and return JWT token
     
+    Supports both JSON body and form data.
+    Accepts either email or username field.
+    
     Args:
-        login_request: Email and password
+        login_request: Login credentials (email/username + password)
         db: Database session
         
     Returns:
@@ -37,11 +80,20 @@ async def login(
     """
     auth_service = AuthService(db)
     
-    # Authenticate user
-    user = auth_service.authenticate_user(
-        email=login_request.email,
-        password=login_request.password
-    )
+    # Use email if provided, otherwise use username
+    email = login_request.email if login_request.email else login_request.username
+    
+    try:
+        user = auth_service.authenticate_user(
+            email=email,
+            password=login_request.password
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     
     if not user:
         raise HTTPException(

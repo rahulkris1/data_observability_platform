@@ -115,3 +115,26 @@ class AuthService:
         self.db.refresh(user)
         
         return user
+    
+    def register_user(self, email: str, password: str, full_name: str, username: Optional[str] = None) -> User:
+        """Register a new user
+        
+        Args:
+            email: User's email address
+            password: Plain text password
+            full_name: User's full name
+            username: Optional username
+            
+        Returns:
+            Created User object
+            
+        Raises:
+            ValueError: If user with email already exists
+        """
+        # Check if user exists
+        existing_user = self.get_user_by_email(email)
+        if existing_user:
+            raise ValueError("User with this email already exists")
+        
+        # Create the user with viewer role by default
+        return self.create_user(email=email, password=password, full_name=full_name, role="viewer")

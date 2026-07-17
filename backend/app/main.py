@@ -65,7 +65,7 @@ app.include_router(auth_router)  # Authentication routes
 app.include_router(audit_router)
 app.include_router(observability_router)
 app.include_router(profiling_router)
-app.include_router(schema_drift_router)
+app.include_router(schema_drift_router, prefix="/api/v1")  # Add prefix for schema-drift
 app.include_router(health_router)
 app.include_router(storage_router, prefix="/api/v1/storage", tags=["storage"])
 app.include_router(glue_router, prefix="/api/v1", tags=["glue"])
@@ -74,12 +74,12 @@ app.include_router(metrics_router)
 app.include_router(freshness_router)
 app.include_router(dag_execution_router, prefix="/api/v1")  # Fix path mismatch: backend uses /dag-executions, frontend expects /api/v1/dag-executions
 app.include_router(cache_router)
-app.include_router(airflow_router)
+app.include_router(airflow_router, prefix="/api/v1")  # Add prefix for airflow
 app.include_router(retry_router)
 app.include_router(rules_router)
-app.include_router(task_router)
+app.include_router(task_router, prefix="/api/v1")  # Add prefix for tasks
 app.include_router(warehouse_router)
-app.include_router(load_monitoring_router)
+app.include_router(load_monitoring_router, prefix="/api/v1")  # Add prefix for load-monitoring
 app.include_router(schema_contracts_router)
 
 ingestion_service = IngestionService()

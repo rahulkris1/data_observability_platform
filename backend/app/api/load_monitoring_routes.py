@@ -13,7 +13,7 @@ from app.services.load_verification_service import LoadVerificationService
 from app.services.load_audit_service import LoadAuditService
 from app.services.retry_validation_service import RetryValidationService
 
-router = APIRouter(prefix="/api/load-monitoring", tags=["Load Monitoring"])
+router = APIRouter(prefix="/load-monitoring", tags=["Load Monitoring"])
 
 
 # Pydantic schemas

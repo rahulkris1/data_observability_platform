@@ -15,6 +15,7 @@ from app.models.schema_version import SchemaVersion
 from app.models.schema_drift_history import SchemaDriftHistory
 from app.models.health_score import HealthScore
 from app.models.retry_queue import RetryQueue
+from app.models.user import User, UserRole
 
 __all__ = [
     "Base", 
@@ -28,5 +29,7 @@ __all__ = [
     "SchemaVersion",
     "SchemaDriftHistory",
     "HealthScore",
-    "RetryQueue"
+    "RetryQueue",
+    "User",
+    "UserRole"
 ]

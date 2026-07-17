@@ -19,7 +19,7 @@ from app.schemas.schema_drift_schemas import (
     SchemaTimelineItem
 )
 
-router = APIRouter(prefix="/api/schema-drift", tags=["Schema Drift"])
+router = APIRouter(prefix="/schema-drift", tags=["Schema Drift"])
 
 
 @router.post("/register", response_model=dict)

@@ -1,13 +1,33 @@
 """Authentication schemas"""
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, model_validator
 from datetime import datetime
 from typing import Optional
 
 
 class LoginRequest(BaseModel):
-    """Login request schema"""
+    """Login request schema - supports both email and username"""
+    email: Optional[EmailStr] = None
+    username: Optional[str] = None
+    password: str
+    
+    @model_validator(mode='after')
+    def check_email_or_username(self):
+        """Ensure at least one of email or username is provided"""
+        if not self.email and not self.username:
+            raise ValueError('Either email or username must be provided')
+        return self
+    
+    class Config:
+        # Allow extra fields for OAuth2 form compatibility
+        extra = "allow"
+
+
+class RegisterRequest(BaseModel):
+    """User registration request schema"""
     email: EmailStr
     password: str
+    full_name: str
+    username: Optional[str] = None
 
 
 class AuthResponse(BaseModel):

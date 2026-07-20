@@ -38,6 +38,7 @@ export { default as MetricsProviderStatus } from './MetricsProviderStatus';
 export { default as CloudObservabilitySection } from './CloudObservabilitySection';
 export { default as ToastNotification } from './ToastNotification';
 export { default as FallbackUI, LoadingState, EmptyState, ErrorState } from './FallbackUI';
+export { default as ErrorBoundary } from './ErrorBoundary';
 
 export type { Column } from './Table';
 export type { IntegrityViolation, FailedRow } from './IntegrityViolationsTable';

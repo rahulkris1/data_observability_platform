@@ -60,7 +60,9 @@ export const PipelinePerformanceSection: React.FC<PipelinePerformanceSectionProp
       const data: RefreshResponse = await response.json();
       
       // Show success message (you can integrate with a toast notification system)
-      console.log('Cache refreshed:', data);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Cache refreshed:', data);
+      }
       
       // Immediately fetch updated stats
       await fetchCacheStats();

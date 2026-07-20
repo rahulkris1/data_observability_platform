@@ -23,7 +23,9 @@ export const AirflowHealthWidget: React.FC<AirflowHealthWidgetProps> = ({
       setError(null);
     } catch (err) {
       setError('Failed to fetch Airflow health');
-      console.error('Error fetching Airflow health:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching Airflow health:', err);
+      }
     } finally {
       setLoading(false);
     }

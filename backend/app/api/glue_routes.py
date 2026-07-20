@@ -5,19 +5,40 @@ Provides REST API endpoints for managing AWS Glue jobs,
 including job execution, status monitoring, and configuration.
 """
 
+import logging
 from typing import Optional, Dict, Any
-from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Query, status
+from pydantic import BaseModel, Field, validator
 
 from app.services.glue_service import get_glue_service
+from app.core.exception_handler import build_success_response, BadRequestException
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/glue", tags=["glue"])
 
 
 class JobRunRequest(BaseModel):
     """Request model for starting a Glue job run."""
-    job_name: Optional[str] = None
-    arguments: Optional[Dict[str, str]] = None
+    job_name: Optional[str] = Field(None, min_length=1, max_length=255, description="Name of the Glue job to run")
+    arguments: Optional[Dict[str, str]] = Field(None, description="Job arguments as key-value pairs")
+    
+    @validator('job_name')
+    def validate_job_name(cls, v):
+        if v is not None and v.strip() == "":
+            raise ValueError("Job name cannot be empty or whitespace")
+        return v
+    
+    @validator('arguments')
+    def validate_arguments(cls, v):
+        if v is not None:
+            # Validate argument keys and values
+            for key, value in v.items():
+                if not key or not isinstance(key, str):
+                    raise ValueError(f"Invalid argument key: {key}")
+                if not isinstance(value, str):
+                    raise ValueError(f"Argument value for '{key}' must be a string")
+        return v
 
 
 class JobRunResponse(BaseModel):

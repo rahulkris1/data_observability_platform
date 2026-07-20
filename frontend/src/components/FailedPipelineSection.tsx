@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { retryService, type FailedValidation } from '../services/retryService';
 import { LoadingSpinner } from './LoadingSpinner';
 import { Alert } from './Alert';
+import { useAuth } from '@/hooks/useAuth';
 
 interface FailedPipelineSectionProps {
   datasetName?: string;
@@ -23,7 +24,8 @@ const FailedPipelineSection: React.FC<FailedPipelineSectionProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [retryingIds, setRetryingIds] = useState<Set<number>>(new Set());
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
-  const [currentUser] = useState('system_user'); // TODO: Get from auth context
+  const { userEmail } = useAuth();
+  const currentUser = userEmail || 'anonymous';
 
   useEffect(() => {
     loadFailedValidations();

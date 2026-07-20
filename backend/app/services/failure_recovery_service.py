@@ -209,28 +209,73 @@ class FailureRecoveryService:
             f"type={original_validation.validation_type}"
         )
         
-        # TODO: Implement actual validation re-execution
-        # This would involve:
-        # - Loading the dataset from storage
-        # - Instantiating the appropriate validator
-        # - Running the validation
-        # - Returning the results
-        
-        # For now, return a simulated result
-        # In production, this would be replaced with actual validation logic
-        return {
-            "status": "passed",  # Simulate success on retry
-            "total_records": original_validation.total_records,
-            "failed_records": 0,
-            "pass_rate": 100.0,
-            "execution_time_ms": 150.0,
-            "message": "Validation re-executed successfully",
-            "details": {
-                "simulated": True,
-                "note": "This is a placeholder - implement actual validation re-execution"
-            },
-            "errors": []
-        }
+        try:
+            # Import services for validation re-execution
+            from app.services.ingestion_service import IngestionService
+            from app.services.validation_aggregator import ValidationAggregator
+            from app.utils.spark_utils import get_spark
+            import pandas as pd
+            
+            # Load dataset from storage
+            ingestion_service = IngestionService()
+            dataset_path = original_validation.dataset_name
+            
+            try:
+                dataset_data = ingestion_service.load_processed_dataset(dataset_path)
+            except FileNotFoundError:
+                # Try raw bucket if processed not found
+                raw_data = ingestion_service.load_raw_dataset(dataset_path)
+                if dataset_path.endswith('.csv'):
+                    from app.utils.csv_parser import parse_csv_bytes
+                    dataset_data = parse_csv_bytes(raw_data)
+                elif dataset_path.endswith('.json'):
+                    from app.utils.json_parser import parse_json_bytes
+                    dataset_data = parse_json_bytes(raw_data)
+                else:
+                    raise ValueError(f"Unsupported file format: {dataset_path}")
+            
+            # Convert to Spark DataFrame
+            spark = get_spark()
+            pandas_df = pd.DataFrame(dataset_data)
+            df = spark.createDataFrame(pandas_df)
+            
+            # Execute validation
+            validation_aggregator = ValidationAggregator()
+            result = validation_aggregator.validate_with_defaults(
+                df=df,
+                dataset_name=original_validation.dataset_name,
+                null_threshold=5.0
+            )
+            
+            # Return validation results
+            return {
+                "status": "passed" if result.overall_passed else "failed",
+                "total_records": result.total_records,
+                "failed_records": result.failed_validators,
+                "pass_rate": (result.passed_validators / result.total_validators * 100) if result.total_validators > 0 else 0,
+                "execution_time_ms": result.total_execution_time_ms,
+                "message": f"Validation re-executed: {result.passed_validators}/{result.total_validators} validators passed",
+                "details": {
+                    "overall_status": result.overall_status.value if hasattr(result.overall_status, 'value') else result.overall_status,
+                    "validators": result.total_validators,
+                    "passed": result.passed_validators,
+                    "failed": result.failed_validators
+                },
+                "errors": [v.message for v in result.validators if not v.passed]
+            }
+            
+        except Exception as e:
+            logger.error(f"Error re-executing validation: {str(e)}")
+            return {
+                "status": "error",
+                "total_records": original_validation.total_records,
+                "failed_records": 0,
+                "pass_rate": 0.0,
+                "execution_time_ms": 0.0,
+                "message": f"Validation re-execution failed: {str(e)}",
+                "details": {"error": str(e)},
+                "errors": [str(e)]
+            }
     
     def bulk_execute_retries(
         self,

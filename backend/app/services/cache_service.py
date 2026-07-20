@@ -26,11 +26,21 @@ class CacheService:
     VALIDATION_METADATA_TTL = 1800  # 30 minutes
     
     def __init__(self):
-        self.redis_client = get_redis_client()
-        self._initialize_stats()
+        self._is_available = False
+        self.redis_client = None
+        
+        try:
+            self.redis_client = get_redis_client()
+            self._is_available = True
+            self._initialize_stats()
+        except Exception as e:
+            logger.error(f"Redis unavailable, cache service will operate in degraded mode: {e}")
     
     def _initialize_stats(self) -> None:
         """Initialize cache statistics counters if they don't exist."""
+        if not self._is_available or not self.redis_client:
+            return
+            
         try:
             stats_key = f"{self.CACHE_STATS_PREFIX}global"
             if not self.redis_client.exists(stats_key):
@@ -42,6 +52,10 @@ class CacheService:
                 })
         except Exception as e:
             logger.error(f"Failed to initialize cache stats: {e}")
+        if not self._is_available or not self.redis_client:
+            return
+            
+            self._is_available = False
     
     def _increment_stat(self, stat_name: str) -> None:
         """Increment a cache statistic counter."""
@@ -62,6 +76,10 @@ class CacheService:
         Returns:
             Cached value or None if not found
         """
+        if not self._is_available or not self.redis_client:
+            self._increment_stat("misses")
+            return None
+            
         try:
             full_key = f"{prefix}{key}"
             value = self.redis_client.get(full_key)
@@ -79,6 +97,7 @@ class CacheService:
         except redis.RedisError as e:
             logger.error(f"Redis error getting key {key}: {e}")
             self._increment_stat("misses")
+            self._is_available = False
             return None
         except Exception as e:
             logger.error(f"Unexpected error getting key {key}: {e}")

@@ -1,5 +1,6 @@
 """API routes for storage provider management and status"""
 
+import logging
 from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
 
@@ -9,6 +10,9 @@ from app.storage.storage_provider import (
     StorageProviderType
 )
 from app.core.config import settings
+from app.core.exception_handler import build_success_response, ServiceUnavailableException
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -26,6 +30,9 @@ async def get_storage_provider_status():
         
         # Check connection
         is_connected = storage_client.check_connection()
+        
+        if not is_connected:
+            logger.warning(f"Storage provider {provider_type.value} is not connected")
         
         # Verify buckets
         bucket_status = storage_client.verify_buckets() if is_connected else {}
@@ -45,12 +52,15 @@ async def get_storage_provider_status():
             response["endpoint"] = settings.MINIO_ENDPOINT
             response["secure"] = settings.MINIO_SECURE
         
-        return response
+        return build_success_response(
+            data=response,
+            message="Storage provider status retrieved successfully"
+        )
         
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to get storage provider status: {str(e)}"
+        logger.error(f"Failed to get storage provider status: {str(e)}", exc_info=True)
+        raise ServiceUnavailableException(
+            f"Failed to get storage provider status: {str(e)}"
         )
 
 

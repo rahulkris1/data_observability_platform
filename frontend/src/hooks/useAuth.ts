@@ -116,8 +116,10 @@ export function useAuth() {
         error.message || 
         'Login failed';
       
-      console.error('Login error:', error);
-      console.error('Error response:', error.response?.data);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Login error:', error);
+        console.error('Error response:', error.response?.data);
+      }
       
       setAuthState(prev => ({
         ...prev,

@@ -70,11 +70,17 @@ export default function ValidationPage() {
   };
   
   const handleCardClick = (summary: ValidationSummary) => {
-    console.log('Card clicked:', summary);
+    // Future: Open detailed view modal
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Card clicked:', summary);
+    }
   };
   
   const handleRowClick = (result: ValidationResult) => {
-    console.log('Row clicked:', result);
+    // Future: Open detailed result view
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Row clicked:', result);
+    }
   };
   
   return (

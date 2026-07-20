@@ -116,6 +116,13 @@ async def execute_validation(
         # Determine dataset path
         dataset_path = request.dataset_path or request.dataset_name
         
+        # Validate dataset path
+        if not dataset_path or not dataset_path.strip():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Dataset name or path is required"
+            )
+        
         # Load dataset from MinIO
         logger.info(f"Loading dataset from MinIO: {dataset_path}")
         try:

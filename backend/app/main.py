@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+import logging
 
 from app.services.ingestion_service import IngestionService
 from app.api.audit_logs import router as audit_router
@@ -30,6 +31,7 @@ from app.core.exception_handler import (
     BadRequestException,
     ServiceUnavailableException
 )
+from app.core.startup_validator import run_startup_validation
 
 # Configure logging on startup
 configure_logging(
@@ -37,6 +39,16 @@ configure_logging(
     enable_console=True,
     enable_json=True,
 )
+
+logger = logging.getLogger(__name__)
+
+# Run startup validation
+is_valid, warnings, errors = run_startup_validation()
+if not is_valid:
+    logger.error("Startup validation failed! Application may not function correctly.")
+    logger.error(f"Errors: {errors}")
+if warnings:
+    logger.warning(f"Startup warnings: {warnings}")
 
 app = FastAPI(
     title="Data Observability Platform",

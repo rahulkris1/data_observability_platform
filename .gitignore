@@ -89,3 +89,7 @@ docker-compose.override.yml
 logs/
 *.log
 airflow/logs/
+
+# Local database files
+*.db
+data_observability.db

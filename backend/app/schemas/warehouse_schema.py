@@ -18,7 +18,7 @@ class WarehouseLoadRequest(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "dataset_name": "customers",
                 "records": [
@@ -51,7 +51,7 @@ class WarehouseLoadResponse(BaseModel):
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "batch_id": "batch_20260612_143025_a3f2e1b9",
                 "status": "completed",
@@ -76,7 +76,7 @@ class WarehouseValidationRequest(BaseModel):
     schema: Optional[Dict[str, str]] = Field(None, description="Schema with field types")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "dataset_name": "customers",
                 "records": [{"id": "1", "name": "John", "email": "john@example.com"}],
@@ -113,7 +113,7 @@ class WarehouseValidationResponse(BaseModel):
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "dataset_name": "customers",
                 "validation_timestamp": "2026-06-12T14:30:00",
@@ -151,7 +151,7 @@ class WarehouseStatisticsResponse(BaseModel):
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "total_records": 50000,
                 "records_by_dataset": {
@@ -211,7 +211,7 @@ class DatasetHealthResponse(BaseModel):
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "dataset_name": "customers",
                 "total_records": 10000,

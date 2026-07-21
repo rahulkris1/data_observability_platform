@@ -1,0 +1,5 @@
+id,name,email,age,city,country
+1,John Doe,john@example.com,30,New York,USA
+1,Jane Smith,jane@example.com,25,San Francisco,USA
+2,Bob Johnson,bob@example.com,35,Chicago,USA
+2,Alice Williams,alice@example.com,28,Boston,USA

@@ -16,6 +16,9 @@ from app.models.schema_drift_history import SchemaDriftHistory
 from app.models.health_score import HealthScore
 from app.models.retry_queue import RetryQueue
 from app.models.user import User, UserRole
+from app.models.freshness_metrics import FreshnessMetric
+from app.models.failed_load import FailedLoad, LoadAuditLog
+from app.models.warehouse_tables import WarehouseStagingData, WarehouseProcessedData, WarehouseLoadHistory
 
 __all__ = [
     "Base", 
@@ -31,5 +34,11 @@ __all__ = [
     "HealthScore",
     "RetryQueue",
     "User",
-    "UserRole"
+    "UserRole",
+    "FreshnessMetric",
+    "FailedLoad",
+    "LoadAuditLog",
+    "WarehouseStagingData",
+    "WarehouseProcessedData",
+    "WarehouseLoadHistory"
 ]

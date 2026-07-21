@@ -18,7 +18,7 @@ class ValidationExecutionRequest(BaseModel):
     null_threshold: Optional[float] = Field(5.0, description="Maximum allowed null percentage", ge=0, le=100)
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "dataset_name": "customers.csv",
                 "validation_types": ["schema", "null", "datatype"],
@@ -62,7 +62,7 @@ class ValidationExecutionResponse(BaseModel):
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "dataset_name": "customers.csv",
                 "validation_timestamp": "2026-06-04T10:30:00",
@@ -126,7 +126,7 @@ class AuditHistoryResponse(BaseModel):
     offset: int = Field(..., description="Offset for pagination")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "total_count": 150,
                 "items": [
@@ -173,7 +173,7 @@ class APIErrorResponse(BaseModel):
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "status_code": 400,
                 "error": "ValidationError",

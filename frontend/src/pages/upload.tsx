@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import UploadButton from '../components/UploadButton';
-import UploadProgress from '../components/UploadProgress';
-import { apiRequest, handleApiError } from '../services/apiClient';
+import DashboardLayout from '@/layouts/DashboardLayout';
+import UploadButton from '@/components/UploadButton';
+import UploadProgress from '@/components/UploadProgress';
+import { apiRequest, handleApiError } from '@/services/apiClient';
 
 export default function UploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -55,15 +56,11 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
-      <div className="mx-auto max-w-4xl rounded-3xl bg-white p-8 shadow-lg">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Dataset Upload</h1>
-          <p className="mt-2 text-slate-600">
-            Upload a CSV or JSON dataset file to the local ingestion workflow and store it in MinIO.
-          </p>
-        </div>
-
+    <DashboardLayout
+      title="Dataset Upload"
+      subtitle="Upload CSV or JSON dataset files to the local ingestion workflow"
+    >
+      <div className="mx-auto max-w-4xl">
         <div className="space-y-6">
           <UploadButton
             selectedFile={selectedFile}
@@ -86,17 +83,17 @@ export default function UploadPage() {
             </div>
           ) : null}
 
-          <section className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+          <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-slate-900">Uploaded files</h2>
-              <span className="text-sm text-slate-500">Local-first ingestion only</span>
+              <h2 className="text-xl font-semibold text-gray-900">Uploaded files</h2>
+              <span className="text-sm text-gray-500">Local-first ingestion only</span>
             </div>
             {uploadedFiles.length === 0 ? (
-              <p className="text-slate-600">No files uploaded yet. Your uploaded datasets will appear here.</p>
+              <p className="text-gray-600">No files uploaded yet. Your uploaded datasets will appear here.</p>
             ) : (
               <ul className="space-y-2">
                 {uploadedFiles.map((name) => (
-                  <li key={name} className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+                  <li key={name} className="rounded-lg bg-gray-50 px-4 py-3 border border-gray-200">
                     {name}
                   </li>
                 ))}
@@ -105,6 +102,6 @@ export default function UploadPage() {
           </section>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

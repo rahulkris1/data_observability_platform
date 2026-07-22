@@ -1,13 +1,14 @@
 import React from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import MetricCard from '../components/MetricCard';
-import CacheStatusIndicator from '../components/CacheStatusIndicator';
-import PipelinePerformanceSection from '../components/PipelinePerformanceSection';
-import CacheMetricsCard from '../components/CacheMetricsCard';
-import StorageProviderStatus from '../components/StorageProviderStatus';
-import CloudWatchStatusCard from '../components/CloudWatchStatusCard';
-import MetricsProviderStatus from '../components/MetricsProviderStatus';
-import CloudObservabilitySection from '../components/CloudObservabilitySection';
+// Commented out to avoid timeouts in simplified mode (Redis/MinIO/CloudWatch not connected)
+// import CacheStatusIndicator from '../components/CacheStatusIndicator';
+// import PipelinePerformanceSection from '../components/PipelinePerformanceSection';
+// import CacheMetricsCard from '../components/CacheMetricsCard';
+// import StorageProviderStatus from '../components/StorageProviderStatus';
+// import CloudWatchStatusCard from '../components/CloudWatchStatusCard';
+// import MetricsProviderStatus from '../components/MetricsProviderStatus';
+// import CloudObservabilitySection from '../components/CloudObservabilitySection';
 
 export default function Dashboard() {
   // Placeholder metrics data
@@ -79,34 +80,36 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Cache Status Indicator */}
-      <div className="mb-6">
-        <CacheStatusIndicator />
-      </div>
-
-      {/* Storage Provider Status */}
-      <div className="mb-6">
-        <StorageProviderStatus />
-      </div>
-
-      {/* CloudWatch and Metrics Provider Status */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      {/* Disabled in simplified mode - these services aren't connected */}
+      {/* <div className="mb-6"><CacheStatusIndicator /></div> */}
+      {/* <div className="mb-6"><StorageProviderStatus /></div> */}
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <CloudWatchStatusCard />
         <MetricsProviderStatus />
-      </div>
+      </div> */}
+      {/* <div className="mb-8"><CloudObservabilitySection /></div> */}
+      {/* <div className="mb-8"><PipelinePerformanceSection /></div> */}
 
-      {/* Cloud Observability Section */}
-      <div className="mb-8">
-        <CloudObservabilitySection />
-      </div>
-
-      {/* Cache Monitoring Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2">
-          <PipelinePerformanceSection />
-        </div>
-        <div>
-          <CacheMetricsCard />
+      {/* Simplified Mode Notice */}
+      <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="flex items-start space-x-3">
+          <svg className="w-6 h-6 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h3 className="text-lg font-semibold text-blue-900 mb-2">Simplified Local Mode</h3>
+            <p className="text-sm text-blue-800 mb-2">
+              Running in simplified mode with SQLite database. Some dashboard features are disabled:
+            </p>
+            <ul className="text-sm text-blue-700 space-y-1 ml-4 list-disc">
+              <li>Redis cache monitoring (degraded mode - working without Redis)</li>
+              <li>MinIO storage monitoring (using local file system)</li>
+              <li>CloudWatch metrics (not configured)</li>
+            </ul>
+            <p className="text-sm text-blue-800 mt-3">
+              To enable full features, run with Docker using <code className="bg-blue-100 px-2 py-0.5 rounded">docker-compose up</code>
+            </p>
+          </div>
         </div>
       </div>
 

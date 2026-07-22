@@ -38,6 +38,7 @@ export function useAuth() {
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
 
     const token = authService.getToken();
+    const userInfo = authService.getUserInfo();
     
     if (!token) {
       setAuthState({
@@ -50,11 +51,28 @@ export function useAuth() {
       return;
     }
 
+    // Use stored user info if available (faster, avoids API call)
+    if (userInfo.email && userInfo.role) {
+      setAuthState({
+        isAuthenticated: true,
+        isLoading: false,
+        userEmail: userInfo.email,
+        userRole: userInfo.role,
+        error: null,
+      });
+      return;
+    }
+
     try {
-      // Verify token with backend
+      // Verify token with backend only if no stored user info
       const verification = await authService.verifyToken(token);
 
       if (verification.valid) {
+        // Store user info for next time
+        if (verification.user_email && verification.user_role) {
+          authService.storeUserInfo(verification.user_email, verification.user_role);
+        }
+        
         setAuthState({
           isAuthenticated: true,
           isLoading: false,
@@ -74,15 +92,26 @@ export function useAuth() {
         });
       }
     } catch (error) {
-      // Error verifying token, clear auth state
-      authService.logout();
-      setAuthState({
-        isAuthenticated: false,
-        isLoading: false,
-        userEmail: null,
-        userRole: null,
-        error: 'Authentication failed',
-      });
+      // If verification fails but we have stored user info, trust it
+      if (userInfo.email && userInfo.role) {
+        setAuthState({
+          isAuthenticated: true,
+          isLoading: false,
+          userEmail: userInfo.email,
+          userRole: userInfo.role,
+          error: null,
+        });
+      } else {
+        // No stored info and verification failed
+        authService.logout();
+        setAuthState({
+          isAuthenticated: false,
+          isLoading: false,
+          userEmail: null,
+          userRole: null,
+          error: 'Authentication failed',
+        });
+      }
     }
   }, []);
 

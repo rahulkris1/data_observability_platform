@@ -34,42 +34,44 @@ export default function TopNavigation() {
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
+          <div className="flex items-center flex-shrink-0">
+            <Link href="/dashboard" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">DO</span>
               </div>
-              <span className="text-xl font-semibold text-gray-900">
+              <span className="text-lg font-semibold text-gray-900 whitespace-nowrap">
                 Data Observability
               </span>
             </Link>
           </div>
 
-          {/* Navigation Links */}
-          <div className="flex items-center space-x-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`
-                  px-4 py-2 rounded-md text-sm font-medium transition-colors
-                  ${
-                    isActive(item.href)
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }
-                `}
-              >
-                {item.label}
-              </Link>
-            ))}
+          {/* Navigation Links - Scrollable */}
+          <div className="flex-1 flex items-center justify-center mx-4 overflow-x-auto scrollbar-hide">
+            <div className="flex items-center space-x-1 px-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`
+                    px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap
+                    ${
+                      isActive(item.href)
+                        ? 'bg-blue-50 text-blue-700'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }
+                  `}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </div>
 
           {/* User Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 flex-shrink-0">
             {isAuthenticated && (
               <>
                 {/* User Info */}

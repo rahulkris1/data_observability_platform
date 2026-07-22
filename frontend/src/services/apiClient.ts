@@ -2,13 +2,15 @@ import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import type { ApiResponse, ApiError } from './types';
 
 // API base URL from environment variables
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Empty string uses Next.js proxy (relative URLs), otherwise uses direct URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || '/api/v1';
 
 // Log configuration in development
 if (process.env.NODE_ENV === 'development') {
   console.log('API Configuration:', {
-    baseURL: `${API_BASE_URL}${API_VERSION}`,
+    baseURL: API_BASE_URL ? `${API_BASE_URL}${API_VERSION}` : API_VERSION,
+    mode: API_BASE_URL ? 'Direct connection' : 'Next.js proxy',
     environment: process.env.NODE_ENV,
   });
 }
@@ -37,8 +39,8 @@ interface StandardResponse<T = any> {
  * Axios client instance with default configuration
  */
 const apiClient: AxiosInstance = axios.create({
-  baseURL: `${API_BASE_URL}${API_VERSION}`,
-  timeout: 10000,
+  baseURL: API_BASE_URL ? `${API_BASE_URL}${API_VERSION}` : API_VERSION,
+  timeout: 30000, // Increased timeout to 30 seconds for slower connections
   headers: {
     'Content-Type': 'application/json',
   },

@@ -84,6 +84,9 @@ test-output/
 .env.docker
 docker-compose.override.yml
 .docker/
+.env.simple
+.env.glue.example
+.env.example
 
 # Logs
 logs/

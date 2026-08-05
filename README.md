@@ -2,51 +2,51 @@
 
 ## About
 
-I built this project to learn how modern data pipelines validate and monitor data before it is loaded into a warehouse.
+Data Observability Platform is a local-first application for validating and monitoring datasets before they are loaded into a data warehouse.
 
-The application accepts CSV or JSON datasets, validates the data, stores audit information, profiles the dataset, and shows the results in a web dashboard.
+The project reads CSV or JSON files, runs a series of data quality checks, generates dataset profiling information, stores audit logs, and displays the results through a web dashboard. Apache Airflow is used to orchestrate the pipeline, while Celery handles background processing.
 
-The entire project runs locally using Docker. Later, it can be connected to AWS services like S3, Glue, and CloudWatch without changing the overall application flow.
+Everything is designed to run locally using Docker. After completing the local implementation, the same project can be connected to AWS services such as Amazon S3, AWS Glue, and CloudWatch.
 
 ---
 
-## What it does
+## Features
 
-The workflow looks like this:
+- Upload CSV and JSON datasets
+- Dataset ingestion using PySpark
+- Schema validation
+- Null value validation
+- Data type validation
+- Duplicate record detection
+- Primary and foreign key validation
+- Dataset profiling
+- Audit logging
+- Warehouse loading
+- Pipeline monitoring
+- Retry failed validations
+- Health score dashboard
+
+---
+
+## Workflow
 
 ```
 Upload Dataset
         ↓
-Store File
+Store File (MinIO)
         ↓
-Read with PySpark
+Read Dataset (PySpark)
         ↓
-Run Data Validations
+Run Validation Rules
         ↓
-Generate Data Profile
+Generate Dataset Profile
         ↓
-Save Audit Information
+Store Audit Logs
         ↓
-Load into Warehouse
+Load Data into Warehouse
         ↓
-Display Results on Dashboard
+Update Dashboard
 ```
-
----
-
-## Validations
-
-Currently the application checks:
-
-- Schema validation
-- Missing columns
-- Null values
-- Data types
-- Duplicate records
-- Primary key validation
-- Foreign key validation
-
-If any validation fails, the dataset is marked as failed and the reason is stored in the audit logs.
 
 ---
 
@@ -58,8 +58,8 @@ If any validation fails, the dataset is marked as failed and the reason is store
 - PySpark
 - PostgreSQL
 - SQLAlchemy
-- Celery
 - Redis
+- Celery
 - Apache Airflow
 
 ### Frontend
@@ -67,6 +67,7 @@ If any validation fails, the dataset is marked as failed and the reason is store
 - Next.js
 - React
 - Tailwind CSS
+- Axios
 
 ### Local Infrastructure
 
@@ -74,26 +75,46 @@ If any validation fails, the dataset is marked as failed and the reason is store
 - Docker Compose
 - MinIO
 
+### Future Cloud Integration
+
+- Amazon S3
+- AWS Glue
+- Amazon CloudWatch
+
 ---
 
-## Running the project
+## Project Structure
 
-Clone the repository.
+```
+data_observability_platform/
+
+├── backend/
+├── frontend/
+├── airflow/
+├── glue_jobs/
+├── tests/
+├── docs/
+└── docker-compose.yml
+```
+
+---
+
+## Running the Project
 
 Start Docker services.
 
 ```bash
-docker compose up
+docker compose up -d
 ```
 
-Run the backend.
+Start the backend.
 
 ```bash
 cd backend
 uvicorn app.main:app --reload
 ```
 
-Run the frontend.
+Start the frontend.
 
 ```bash
 cd frontend
@@ -101,47 +122,72 @@ npm install
 npm run dev
 ```
 
----
-
-## Project Structure
+Open the application.
 
 ```
-backend/
-frontend/
-airflow/
-glue_jobs/
-tests/
-docs/
+Frontend : http://localhost:3000
+Backend  : http://localhost:8000
+Swagger  : http://localhost:8000/docs
+Airflow  : http://localhost:8080
 ```
 
 ---
 
-## Sample datasets
+## Validation Rules
 
-The project includes sample datasets for testing different scenarios.
+The application currently validates:
 
-- Valid dataset
-- Missing columns
+- Schema structure
+- Required columns
 - Null values
+- Data types
 - Duplicate records
-- Invalid foreign keys
+- Primary key uniqueness
+- Foreign key relationships
+
+Validation results are stored in PostgreSQL and displayed on the dashboard.
 
 ---
 
-## Future Work
+## Dashboard
 
-The application currently runs completely locally.
+The dashboard provides:
 
-The next step is connecting it with:
-
-- Amazon S3
-- AWS Glue
-- Amazon CloudWatch
-
-The goal is to keep the application logic the same and only replace the local infrastructure.
+- Dataset upload history
+- Validation results
+- Audit history
+- Dataset profiling
+- Pipeline execution status
+- Warehouse status
+- Health score
+- Logs and metrics
 
 ---
 
-## Notes
+## Sample Test Files
 
-This project was built as a learning project to understand data quality, observability, pipeline orchestration, and modern data engineering workflows.
+Use the sample datasets included with the project to test different scenarios.
+
+- customers_valid.csv
+- customers_missing_columns.csv
+- customers_null_values.csv
+- customers_duplicate_ids.csv
+- orders_valid.csv
+- orders_invalid_fk.csv
+- products_valid.csv
+
+---
+
+## Future Improvements
+
+The project currently runs completely in a local environment.
+
+The next step is to integrate:
+
+- Amazon S3 for file storage
+- AWS Glue for distributed data processing
+- Amazon CloudWatch for monitoring and logging
+
+The application is designed so these services can be added without changing the overall workflow.
+
+---
